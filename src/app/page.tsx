@@ -17,6 +17,7 @@ interface SessionData {
   uses_mcps?: string;
   approval_process?: string;
   challenge_attempts: number;
+  challenge_started_at?: string;
 }
 
 interface ChatMessage {
