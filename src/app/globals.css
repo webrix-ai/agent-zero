@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Commander Keen / EGA Color Palette */
+  --keen-black: #000000;
+  --keen-blue: #0000AA;
+  --keen-green: #00AA00;
+  --keen-cyan: #00AAAA;
+  --keen-red: #AA0000;
+  --keen-magenta: #AA00AA;
+  --keen-brown: #AA5500;
+  --keen-gray: #AAAAAA;
+  --keen-darkgray: #555555;
+  --keen-lightblue: #5555FF;
+  --keen-lightgreen: #55FF55;
+  --keen-lightcyan: #55FFFF;
+  --keen-lightred: #FF5555;
+  --keen-lightmagenta: #FF55FF;
+  --keen-yellow: #FFFF55;
+  --keen-white: #FFFFFF;
+  
+  /* Extended darks */
+  --keen-darkblue: #000055;
+  --keen-darkgreen: #003300;
+  --keen-darkred: #330000;
+  --keen-darkcyan: #003333;
+}
+
+@theme inline {
+  /* Colors */
+  --color-keen-black: var(--keen-black);
+  --color-keen-blue: var(--keen-blue);
+  --color-keen-green: var(--keen-green);
+  --color-keen-cyan: var(--keen-cyan);
+  --color-keen-red: var(--keen-red);
+  --color-keen-magenta: var(--keen-magenta);
+  --color-keen-brown: var(--keen-brown);
+  --color-keen-gray: var(--keen-gray);
+  --color-keen-darkgray: var(--keen-darkgray);
+  --color-keen-lightblue: var(--keen-lightblue);
+  --color-keen-lightgreen: var(--keen-lightgreen);
+  --color-keen-lightcyan: var(--keen-lightcyan);
+  --color-keen-lightred: var(--keen-lightred);
+  --color-keen-lightmagenta: var(--keen-lightmagenta);
+  --color-keen-yellow: var(--keen-yellow);
+  --color-keen-white: var(--keen-white);
+  --color-keen-darkblue: var(--keen-darkblue);
+  --color-keen-darkgreen: var(--keen-darkgreen);
+  --color-keen-darkred: var(--keen-darkred);
+  --color-keen-darkcyan: var(--keen-darkcyan);
+  
+  /* Font family */
+  --font-pixel: 'Press Start 2P', cursive;
+  
+  /* Animations */
+  --animate-blink: blink 1s infinite;
+  --animate-flicker: flicker 0.15s infinite;
+  --animate-bounce-slow: bounce-slow 2s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
+  --animate-fade-in: fade-in 0.5s ease-out forwards;
+  --animate-shake: shake 0.5s ease-in-out;
+}
+
+/* Keyframes */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.02; }
+  50% { opacity: 0.04; }
+  100% { opacity: 0.02; }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Utility classes */
+.font-pixel {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--keen-black);
+  color: var(--keen-green);
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--keen-black);
+  border: 2px solid var(--keen-darkgray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--keen-cyan);
+  border: 2px solid var(--keen-black);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--keen-yellow);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--keen-cyan);
+  color: var(--keen-black);
+}
+
+/* Focus styling for accessibility */
+:focus-visible {
+  outline: 2px solid var(--keen-yellow);
+  outline-offset: 2px;
+}
