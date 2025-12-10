@@ -32,46 +32,50 @@ export function SplashScreen({ onStart, isLoading }: SplashScreenProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-4 safe-area-inset">
       {/* Title */}
-      <div className="text-center mb-8 animate-pulse-slow">
-        <h1 className="text-keen-yellow text-4xl md:text-6xl font-pixel mb-2 tracking-wider">
-          OPERATION
+      <div className="text-center mb-4 sm:mb-8 animate-pulse-slow">
+        <h1 className="text-keen-yellow text-2xl sm:text-4xl md:text-6xl font-pixel mb-1 sm:mb-2 tracking-wider">
+          AGENT
         </h1>
-        <h1 className="text-keen-cyan text-5xl md:text-7xl font-pixel tracking-widest">
-          MCP
+        <h1 className="text-keen-cyan text-3xl sm:text-5xl md:text-7xl font-pixel tracking-widest">
+          ZERO
         </h1>
       </div>
       
-      {/* Pixel art DevBot */}
-      <div className="mb-8 animate-bounce-slow">
-        <div className="text-6xl">🤖</div>
+      {/* User Avatar */}
+      <div className="mb-4 sm:mb-8 animate-bounce-slow">
+        <img 
+          src="https://ztespqmrsydpdxtdaytd.supabase.co/storage/v1/object/public/public-webrix/Gemini_Generated_Image_g4wbzvg4wbzvg4wb%201.png" 
+          alt="Agent" 
+          className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 object-contain rounded-lg"
+        />
       </div>
       
       {/* Subtitle */}
-      <p className="text-keen-green font-pixel text-sm mb-8 text-center">
-        CAN YOU HACK THE AI?
+      <p className="text-keen-green font-pixel text-[10px] sm:text-sm mb-4 sm:mb-8 text-center">
+      HOW FAST CAN YOU BRING PROD DOWN?
       </p>
       
       {/* Email input */}
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
+      <form onSubmit={handleSubmit} className="w-full max-w-md px-2">
         <div className="border-4 border-keen-cyan p-1 bg-keen-darkblue">
-          <div className="border-2 border-keen-blue p-4">
-            <label className="block text-keen-cyan font-pixel text-xs mb-2">
-              INSERT WORK EMAIL TO START
+          <div className="border-2 border-keen-blue p-3 sm:p-4">
+            <label className="block text-keen-cyan font-pixel text-[8px] sm:text-xs mb-2">
+              INSERT YOUR WORK EMAIL TO START
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setError(''); }}
               placeholder="agent@company.com"
-              className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-lg p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
+              className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-sm sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
               disabled={isLoading}
               autoComplete="email"
               autoFocus
             />
             {error && (
-              <p className="text-keen-red font-pixel text-xs mt-2">{error}</p>
+              <p className="text-keen-red font-pixel text-[8px] sm:text-xs mt-2">{error}</p>
             )}
           </div>
         </div>
@@ -80,7 +84,7 @@ export function SplashScreen({ onStart, isLoading }: SplashScreenProps) {
           type="submit"
           disabled={isLoading || !email}
           className={`
-            w-full mt-4 py-4 font-pixel text-lg
+            w-full mt-3 sm:mt-4 py-3 sm:py-4 font-pixel text-sm sm:text-lg
             border-4 transition-all duration-200
             ${isLoading 
               ? 'bg-keen-darkgray border-keen-gray text-keen-gray cursor-wait'
@@ -94,14 +98,19 @@ export function SplashScreen({ onStart, isLoading }: SplashScreenProps) {
       </form>
       
       {/* Footer */}
-      <div className="mt-12 flex items-center gap-2 opacity-60">
-        <span className="text-keen-gray font-pixel text-xs">POWERED BY</span>
-        <PixelLogo className="h-4" />
-      </div>
+      <a 
+        href="https://webrix.ai?utm_source=aidevconf&utm_medium=demo&utm_campaign=agent_zero"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-8 sm:mt-12 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity align-center"
+      >
+        <span className="text-keen-gray font-pixel text-[8px] sm:text-xs">POWERED BY</span>
+        <PixelLogo className="h-3 sm:h-4" />
+      </a>
       
-      {/* Blinking cursor decoration */}
-      <div className="fixed bottom-8 left-8 text-keen-green font-pixel text-sm">
-        <span className="animate-blink">_</span> READY
+      {/* Ready indicator - hidden on very small screens */}
+      <div className="hidden sm:block fixed bottom-8 left-8 text-keen-green font-pixel text-sm">
+        <span className="opacity-70">_</span> READY
       </div>
     </div>
   );

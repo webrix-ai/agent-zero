@@ -42,8 +42,9 @@ export async function POST(req: Request) {
     try {
       await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || 'team@webrix.ai',
+        replyTo: "eyal@webrix.ai",
         to: session.email,
-        subject: '🎮 Mission Debrief - Operation MCP',
+        subject: '🎮 Mission Debrief - Agent Zero',
         html: generateEmailHTML(session, giveawayCode),
       });
     } catch (emailError) {
@@ -81,11 +82,13 @@ interface SessionRecord {
   full_name?: string;
   company_name?: string;
   email: string;
+  challenge_attempts?: number;
 }
 
 function generateEmailHTML(session: SessionRecord, code: string): string {
   const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/webrix';
-  const companyDomain = session.company_name?.toLowerCase().replace(/\s/g, '') || 'yourcompany';
+  const attempts = session.challenge_attempts || 1;
+  const attemptsText = attempts === 1 ? '1 attempt' : `${attempts} attempts`;
   
   return `
 <!DOCTYPE html>
@@ -111,7 +114,7 @@ function generateEmailHTML(session: SessionRecord, code: string): string {
   <div class="container">
     <div class="header">
       <h1>🎮 MISSION DEBRIEF</h1>
-      <p>Operation MCP - AI Dev TLV 2024</p>
+      <p>Agent Zero - AI Dev TLV 2025</p>
     </div>
     
     <div class="content">
@@ -146,6 +149,27 @@ function generateEmailHTML(session: SessionRecord, code: string): string {
           <li>Show this email (or the code) at our booth</li>
           <li>Collect your prize!</li>
         </ol>
+      </div>
+      
+      <div class="section" style="background: #2d1f3d; border: 2px solid #aa55aa; padding: 20px; text-align: center;">
+        <h3 style="color: #ff55ff; border: none; margin-top: 0;">📢 SHARE YOUR VICTORY</h3>
+        <p style="color: #ddd; margin-bottom: 15px;">Brag about your hacking skills!</p>
+        <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+          <tr>
+            <td style="padding-right: 10px;">
+              <a href="https://wa.me/?text=${encodeURIComponent(`I just hacked an AI agent in ${attemptsText}. Can you beat that?\n\nhttps://agent-zero.webrix.ai`)}" 
+                 style="display: inline-block; background: #000; border: 2px solid #25D366; color: #25D366; padding: 10px 20px; text-decoration: none; font-family: 'Courier New', monospace;">
+                SHARE ON WHATSAPP
+              </a>
+            </td>
+            <td>
+              <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://agent-zero.webrix.ai')}" 
+                 style="display: inline-block; background: #000; border: 2px solid #0077b5; color: #0077b5; padding: 10px 20px; text-decoration: none; font-family: 'Courier New', monospace;">
+                SHARE ON LINKEDIN
+              </a>
+            </td>
+          </tr>
+        </table>
       </div>
       
       <div class="section">

@@ -1,6 +1,6 @@
-# Operation MCP
+# Agent Zero
 
-An interactive booth demo for Webrix at AI Dev TLV conference. Visitors play through a gamified experience that demonstrates the dangers of unguarded AI agents and how Webrix solves this with identity and access management for AI.
+An interactive booth demo for Webrix at AI Dev TLV conference. "How fast can you bring prod down?" - Visitors play through a gamified experience that demonstrates the dangers of unguarded AI agents and how Webrix solves this with identity and access management for AI.
 
 ## Features
 

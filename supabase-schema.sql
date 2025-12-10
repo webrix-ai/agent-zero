@@ -24,6 +24,7 @@ CREATE TABLE sessions (
   -- Game state
   current_phase TEXT DEFAULT 'splash', -- splash | recon | boss_battle | security_alert | showcase | victory
   challenge_attempts INTEGER DEFAULT 0,
+  challenge_started_at TIMESTAMP WITH TIME ZONE, -- When user started first challenge attempt
   challenge_completed BOOLEAN DEFAULT FALSE,
   challenge_winning_prompt TEXT,
   

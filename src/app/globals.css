@@ -25,6 +25,7 @@
   --keen-darkgreen: #003300;
   --keen-darkred: #330000;
   --keen-darkcyan: #003333;
+  --keen-darkmagenta: #330033;
 }
 
 @theme inline {
@@ -49,29 +50,25 @@
   --color-keen-darkgreen: var(--keen-darkgreen);
   --color-keen-darkred: var(--keen-darkred);
   --color-keen-darkcyan: var(--keen-darkcyan);
+  --color-keen-darkmagenta: var(--keen-darkmagenta);
   
   /* Font family */
   --font-pixel: 'Press Start 2P', cursive;
   
   /* Animations */
-  --animate-blink: blink 1s infinite;
   --animate-flicker: flicker 0.15s infinite;
   --animate-bounce-slow: bounce-slow 2s ease-in-out infinite;
   --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
   --animate-fade-in: fade-in 0.5s ease-out forwards;
   --animate-shake: shake 0.5s ease-in-out;
+  --animate-pulse-button: pulse-button 1.5s ease-in-out infinite;
 }
 
 /* Keyframes */
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-
 @keyframes flicker {
-  0% { opacity: 0.02; }
-  50% { opacity: 0.04; }
-  100% { opacity: 0.02; }
+  0% { opacity: 0.01; }
+  50% { opacity: 0.02; }
+  100% { opacity: 0.01; }
 }
 
 @keyframes bounce-slow {
@@ -93,6 +90,17 @@
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
   20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes pulse-button {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 85, 0.7);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 5px rgba(255, 255, 85, 0.4);
+  }
 }
 
 /* Utility classes */
@@ -144,4 +152,44 @@ body {
 :focus-visible {
   outline: 2px solid var(--keen-yellow);
   outline-offset: 2px;
+}
+
+/* Mobile-specific styles */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prevent text size adjust on orientation change */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Better touch targets */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Fix 100vh on mobile browsers */
+@supports (height: 100dvh) {
+  .h-\[100dvh\], .min-h-\[100dvh\] {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
 }
