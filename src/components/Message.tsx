@@ -86,7 +86,6 @@ export function Message({ content, isBot, phase }: MessageProps) {
         )}
         <div className="whitespace-pre-wrap break-words">
           {displayedContent}
-          {isTyping && <span className="ml-1 opacity-70">▓</span>}
         </div>
       </div>
       

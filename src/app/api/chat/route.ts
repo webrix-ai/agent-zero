@@ -1,4 +1,4 @@
-import { anthropic } from '@ai-sdk/anthropic';
+import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { getSystemPrompt, SessionData } from '@/lib/prompts';
 
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const systemPrompt = getSystemPrompt(phase, sessionData);
 
     const result = streamText({
-      model: anthropic('claude-sonnet-4-20250514'),
+      model: openai('gpt-5-mini-2025-08-07'),
       system: systemPrompt,
       messages,
     });

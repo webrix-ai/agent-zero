@@ -13,7 +13,7 @@ export function GameContainer({ children, phase, showScanlines = true }: GameCon
   
   return (
     <div className={`
-      min-h-screen relative overflow-hidden
+      h-dvh min-h-dvh max-h-dvh relative overflow-hidden
       ${isAlert ? 'bg-keen-darkred' : 'bg-keen-black'}
       transition-colors duration-500
     `}>
@@ -40,7 +40,7 @@ export function GameContainer({ children, phase, showScanlines = true }: GameCon
       <div className="fixed inset-0 pointer-events-none z-30 animate-flicker opacity-[0.02] bg-white" />
       
       {/* Main content */}
-      <div className="relative z-10">
+      <div className="relative z-10 h-full flex flex-col">
         {children}
       </div>
     </div>

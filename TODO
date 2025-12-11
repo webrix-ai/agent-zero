@@ -3,8 +3,14 @@
 [x] fix scroll to last message
 [x] fix mobile layout
 [x] improve messageing
-[] zero in on questions to be asked
 [x] deploy to vercel
+[] zero in on questions to be asked
+
+Left to do
+[] fix mobile layout
+[] fix typing indicator
+[] change content to gh from postgres
+[] Add timer
 
 ~ Nice to haves
 ---
