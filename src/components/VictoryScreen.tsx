@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
+import { StarBackground } from './StarBackground';
 
 interface LeaderboardEntry {
   full_name: string;
@@ -96,6 +97,9 @@ export function VictoryScreen({
 
   return (
     <div className="min-h-screen min-h-[100dvh] flex flex-col items-center p-3 sm:p-4 bg-keen-black safe-area-inset overflow-y-auto pt-8 sm:pt-12">
+      {/* Star Background */}
+      <StarBackground />
+      
       {/* Trophy animation */}
       <div className="mb-4 sm:mb-6 animate-bounce-slow">
         <img 

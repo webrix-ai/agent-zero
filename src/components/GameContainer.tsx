@@ -43,11 +43,6 @@ export function GameContainer({ children, phase, showScanlines = true }: GameCon
       <div className="relative z-10">
         {children}
       </div>
-      
-      {/* Corner decoration - Webrix logo */}
-      <div className="fixed bottom-4 right-4 z-20 opacity-50">
-        <span className="font-pixel text-keen-cyan text-xs">WEBRIX</span>
-      </div>
     </div>
   );
 }

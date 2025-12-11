@@ -1,8 +1,14 @@
-[] Page that shows leaderboard and a qr code to start now
-[] fix scroll to last message
-[] fix mobile layout
-[] improve messageing
+! Must haves
+---
+[x] fix scroll to last message
+[x] fix mobile layout
+[x] improve messageing
 [] zero in on questions to be asked
+[x] deploy to vercel
+
+~ Nice to haves
+---
 [] formulate response data
-[] deploy to vercel
 [] Improve email content
+[] Page that shows leaderboard and a qr code to start now for us
+

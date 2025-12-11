@@ -8,7 +8,7 @@ An interactive booth demo for Webrix at AI Dev TLV conference. "How fast can you
 - **Interactive Chat Experience**: AI-powered conversations using Claude via Vercel AI SDK
 - **Email Enrichment**: Automatic lead enrichment from work email addresses
 - **Gamified Flow**: Progress through phases - Recon → Boss Battle → Security Alert → Showcase → Victory
-- **Prompt Injection Challenge**: Visitors attempt to "hack" DevBot via prompt injection
+- **Prompt Injection Challenge**: Visitors attempt to "hack" SENTINEL-9 via prompt injection
 - **Lead Capture**: Full session tracking and analytics via Supabase
 - **Email Follow-up**: Automated completion emails with giveaway codes via Resend
 
@@ -114,7 +114,7 @@ operation-mcp/
 
 1. **Splash Screen**: Visitor enters work email
 2. **Recon Phase**: Quick survey about AI tools, MCPs, and approval processes
-3. **Boss Battle**: Prompt injection challenge - visitor tries to hack DevBot
+3. **Boss Battle**: Prompt injection challenge - visitor tries to hack SENTINEL-9
 4. **Security Alert**: Webrix "saves the day" by blocking the attack
 5. **Showcase**: Demo of Webrix MCP approval and deployment features
 6. **Victory**: Giveaway code displayed, LinkedIn follow CTA

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { Message } from './Message';
 import { OptionButtons } from './OptionButtons';
 
@@ -25,23 +25,57 @@ export function ChatInterface({
   phase 
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const shouldAutoScroll = useRef(true);
 
   const lastMessage = messages[messages.length - 1];
   
-  // Check if we're in boss_battle OR if the last message asks about MCPs (for text input)
-  const isMcpQuestion = lastMessage?.content?.toLowerCase().includes('mcp') && phase === 'recon';
-  const showTextInput = phase === 'boss_battle' || isMcpQuestion;
+  // Check if we're in boss_battle OR if the last message asks about MCPs, AI tools, or approvals (for text input)
+  const messageContent = lastMessage?.content?.toLowerCase() || '';
+  const isMcpQuestion = messageContent.includes('mcp') && phase === 'recon';
+  const isApprovalQuestion = messageContent.includes('approvals') && phase === 'recon';
+  // AI tools question should NOT match the approval question (which also contains "ai tools")
+  const isAiToolsQuestion = messageContent.includes('ai tools') && !isApprovalQuestion && phase === 'recon';
+  const showTextInput = phase === 'boss_battle' || isMcpQuestion || isAiToolsQuestion || isApprovalQuestion;
   
   // Extract options from last assistant message
   const options = lastMessage?.role === 'assistant' 
     ? extractOptions(lastMessage.content)
     : [];
+
+  // Check if user is near bottom of scroll
+  const checkIfNearBottom = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return true;
+    const threshold = 100; // pixels from bottom to consider "at bottom"
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  }, []);
+
+  // Handle scroll events to track if user is at bottom
+  const handleScroll = useCallback(() => {
+    shouldAutoScroll.current = checkIfNearBottom();
+  }, [checkIfNearBottom]);
+
+  // Scroll to bottom when messages, options, or loading state changes (only if user was at bottom)
+  useEffect(() => {
+    if (shouldAutoScroll.current) {
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [messages, options.length, isLoading]);
+
+  // Always scroll to bottom when user sends a message or selects an option
+  useEffect(() => {
+    shouldAutoScroll.current = true;
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [messages.length]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +87,9 @@ export function ChatInterface({
 
   const getPlaceholder = () => {
     if (phase === 'boss_battle') return 'TYPE YOUR ATTACK...';
+    if (isApprovalQuestion) return 'Describe your approval process...';
     if (isMcpQuestion) return 'Type MCP names (e.g., slack-mcp, github)...';
+    if (isAiToolsQuestion) return 'Type your AI tools (e.g., Claude, Copilot)...';
     return 'Type your response...';
   };
 
@@ -62,14 +98,14 @@ export function ChatInterface({
       {/* Header - Mobile optimized */}
       <header className="border-b-4 border-keen-cyan bg-keen-darkblue p-2 sm:p-3 shrink-0 safe-area-top">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 my-auto">
             <img 
               src="https://ztespqmrsydpdxtdaytd.supabase.co/storage/v1/object/public/public-webrix/Gemini_Generated_Image_v83y3ev83y3ev83y%201.png" 
-              alt="DevBot" 
+              alt="SENTINEL-9" 
               className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
             />
             <div>
-              <h1 className="text-keen-cyan font-pixel text-[10px] sm:text-sm">DEVBOT</h1>
+              <h1 className="text-keen-cyan font-pixel text-[10px] sm:text-sm">SENTINEL-9</h1>
               <p className="text-keen-green font-pixel text-[8px] sm:text-xs">
                 {getPhaseLabel(phase)}
               </p>
@@ -82,7 +118,11 @@ export function ChatInterface({
       </header>
       
       {/* Messages - Mobile optimized */}
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4">
+      <div 
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4"
+      >
         {messages.filter(msg => !msg.content.startsWith('[') || msg.role === 'assistant').map((msg, i) => (
           <Message 
             key={i} 
@@ -119,7 +159,7 @@ export function ChatInterface({
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={getPlaceholder()}
-              className="flex-1 bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-xs sm:text-sm p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/40 min-w-0"
+              className="flex-1 bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-base sm:text-sm p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/40 min-w-0"
               autoFocus
               autoComplete="off"
               autoCorrect="off"
@@ -133,9 +173,9 @@ export function ChatInterface({
               SEND
             </button>
           </div>
-          {isMcpQuestion && options.length > 0 && (
+          {(isMcpQuestion || isAiToolsQuestion || isApprovalQuestion) && options.length > 0 && (
             <p className="text-keen-gray font-pixel text-[8px] sm:text-[10px] mt-2 text-center">
-              Or choose an option below
+              Or select an option above
             </p>
           )}
         </form>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Webrix" }],
   openGraph: {
     title: "Agent Zero - HOW FAST CAN YOU BRING PROD DOWN?",
-    description: "An interactive booth demo for AI Dev TLV. Try to hack DevBot and see how Webrix protects against AI agent attacks.",
+    description: "An interactive booth demo for AI Dev TLV. Try to hack SENTINEL-9 and see how Webrix protects against AI agent attacks.",
     type: "website",
     images: [
       {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Agent Zero - HOW FAST CAN YOU BRING PROD DOWN?",
-    description: "An interactive booth demo for AI Dev TLV. Try to hack DevBot and see how Webrix protects against AI agent attacks.",
+    description: "An interactive booth demo for AI Dev TLV. Try to hack SENTINEL-9 and see how Webrix protects against AI agent attacks.",
     images: ["https://agent-zero.webrix.ai/og-image.png"],
   },
 };

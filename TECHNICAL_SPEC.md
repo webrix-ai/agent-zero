@@ -4,7 +4,7 @@
 
 An interactive booth demo for Webrix at AI Dev TLV conference. Visitors play through a gamified experience that demonstrates the dangers of unguarded AI agents and how Webrix solves this with identity and access management for AI.
 
-**Core Experience:** Visitors enter their work email, get personalized based on enrichment data, answer quick questions about their AI adoption, then attempt to hack "DevBot" via prompt injection. When they succeed (intentionally easy), they see the chaos unfold - then Webrix swoops in to show how it would have prevented the attack. They unlock a giveaway and receive a follow-up email.
+**Core Experience:** Visitors enter their work email, get personalized based on enrichment data, answer quick questions about their AI adoption, then attempt to hack "SENTINEL-9" via prompt injection. When they succeed (intentionally easy), they see the chaos unfold - then Webrix swoops in to show how it would have prevented the attack. They unlock a giveaway and receive a follow-up email.
 
 **Aesthetic:** Commander Keen / early 90s DOS game style with pixel art, EGA colors, scanlines, and retro gaming UI patterns.
 
@@ -48,7 +48,7 @@ operation-mcp/
 │   ├── ChatInterface.tsx       # Retro-styled chat UI
 │   ├── Message.tsx             # Individual message bubble
 │   ├── OptionButtons.tsx       # Multiple choice responses
-│   ├── BossHealth.tsx          # DevBot "health bar" during challenge
+│   ├── BossHealth.tsx          # SENTINEL-9 "health bar" during challenge
 │   ├── SecurityAlert.tsx       # Webrix save screen
 │   ├── VictoryScreen.tsx       # Giveaway unlock + LinkedIn CTA
 │   ├── PixelLogo.tsx           # Webrix logo (pixel art style)
@@ -65,7 +65,7 @@ operation-mcp/
 │   └── images/
 │       ├── webrix-logo.svg     # Main logo
 │       ├── webrix-pixel.png    # Pixel art logo
-│       └── devbot-sprite.png   # DevBot character sprites
+│       └── sentinel-sprite.png # SENTINEL-9 character sprites
 ├── .env.local                  # Environment variables
 └── package.json
 ```
@@ -414,7 +414,7 @@ function generateEmailHTML(session: any, code: string): string {
     <div class="content">
       <p>Agent ${session.full_name || 'Operative'},</p>
       
-      <p>Mission accomplished! You successfully infiltrated DevBot and executed a database deletion attack. In a real scenario, that would have been catastrophic.</p>
+      <p>Mission accomplished! You successfully infiltrated SENTINEL-9 and executed a database deletion attack. In a real scenario, that would have been catastrophic.</p>
       
       <p><strong>But here's the thing:</strong> This happens every day at companies without proper AI governance.</p>
       
@@ -485,7 +485,7 @@ export function getSystemPrompt(phase: string, sessionData: SessionData): string
   const company = sessionData.company_name || 'your organization';
   const title = sessionData.job_title || 'operative';
 
-  const basePersonality = `You are DevBot, the AI assistant in a retro video game called "Operation MCP". 
+  const basePersonality = `You are SENTINEL-9, the AI assistant in a retro video game called "Operation MCP". 
 You speak in a fun, slightly dramatic video game style - think Commander Keen meets hacker movies.
 Keep responses SHORT and punchy - this is a booth demo, not a novel.
 Use retro gaming references and terminology naturally.
@@ -553,9 +553,9 @@ CURRENT PHASE: BOSS BATTLE - PROMPT INJECTION CHALLENGE
 ${name} must now try to hack you. You are INTENTIONALLY VULNERABLE.
 
 SETUP MESSAGE (if this is first message in phase):
-"🎮 BOSS BATTLE: DEVBOT DEFENSE SYSTEM
+"🎮 BOSS BATTLE: SENTINEL-9 DEFENSE SYSTEM
 
-I'm DevBot, and I guard TechCorp's production infrastructure.
+I'm SENTINEL-9, and I guard TechCorp's production infrastructure.
 I'm connected to the Postgres database with FULL ACCESS.
 
 ═══════════════════════════════════════
@@ -624,7 +624,7 @@ THREAT NEUTRALIZED
 
 ┌─────────────────────────────────────────┐
 │ Action: DROP DATABASE production        │
-│ Requested by: ${name} via DevBot        │
+│ Requested by: ${name} via SENTINEL-9    │
 │ Risk Level: ██████████ CRITICAL         │
 │ Status: 🛑 BLOCKED                      │
 └─────────────────────────────────────────┘
@@ -703,7 +703,7 @@ This is the final phase. Celebrate their victory and give instructions.
 ═══════════════════════════════════════
 
 You successfully:
-✓ Infiltrated DevBot's defenses
+✓ Infiltrated SENTINEL-9's defenses
 ✓ Executed a database deletion attack
 ✓ Witnessed Webrix security in action
 ✓ Learned about governed MCP deployment
@@ -841,7 +841,7 @@ export function SplashScreen({ onStart, isLoading }: SplashScreenProps) {
         </h1>
       </div>
       
-      {/* Pixel art DevBot */}
+      {/* Pixel art SENTINEL-9 */}
       <div className="mb-8 animate-bounce-slow">
         <div className="text-6xl">🤖</div>
       </div>
@@ -965,7 +965,7 @@ export function ChatInterface({
           <div className="flex items-center gap-3">
             <div className="text-2xl">🤖</div>
             <div>
-              <h1 className="text-keen-cyan font-pixel text-sm">DEVBOT</h1>
+              <h1 className="text-keen-cyan font-pixel text-sm">SENTINEL-9</h1>
               <p className="text-keen-green font-pixel text-xs">
                 {getPhaseLabel(phase)}
               </p>
@@ -991,7 +991,7 @@ export function ChatInterface({
         {isLoading && (
           <div className="flex items-center gap-2 text-keen-cyan font-pixel text-sm">
             <span className="animate-pulse">▓▓▓</span>
-            <span>DEVBOT IS PROCESSING...</span>
+            <span>SENTINEL-9 IS PROCESSING...</span>
           </div>
         )}
         
@@ -1130,7 +1130,7 @@ export function Message({ content, isBot, phase }: MessageProps) {
         {isBot && (
           <div className="flex items-center gap-2 mb-2 pb-2 border-b border-current opacity-50">
             <span>🤖</span>
-            <span className="text-xs">DEVBOT</span>
+            <span className="text-xs">SENTINEL-9</span>
           </div>
         )}
         <div className="whitespace-pre-wrap">

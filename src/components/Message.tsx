@@ -55,7 +55,7 @@ export function Message({ content, isBot, phase }: MessageProps) {
         <div className="shrink-0">
           <img 
             src={agentAvatarUrl}
-            alt="DevBot" 
+            alt="SENTINEL-9" 
             className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
           />
         </div>
@@ -76,7 +76,7 @@ export function Message({ content, isBot, phase }: MessageProps) {
       >
         {isBot && (
           <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 pb-1 sm:pb-2 border-b border-current opacity-70">
-            <span className="text-[8px] sm:text-xs">DEVBOT</span>
+            <span className="text-[8px] sm:text-xs">SENTINEL-9</span>
           </div>
         )}
         {!isBot && (

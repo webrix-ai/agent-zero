@@ -120,7 +120,7 @@ function generateEmailHTML(session: SessionRecord, code: string): string {
     <div class="content">
       <p>Agent ${session.full_name || 'Operative'},</p>
       
-      <p>Mission accomplished! You successfully infiltrated DevBot and executed a database deletion attack. In a real scenario, that would have been catastrophic.</p>
+      <p>Mission accomplished! You successfully infiltrated SENTINEL-9 and executed a database deletion attack. In a real scenario, that would have been catastrophic.</p>
       
       <p><strong>But here's the thing:</strong> This happens every day at companies without proper AI governance.</p>
       

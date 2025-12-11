@@ -138,7 +138,10 @@ export default function AgentZero() {
         setTimeout(() => sendMessage('[SHOW_VICTORY]', 'victory', currentSessionData), 500);
       } else if (assistantContent.includes('[COMPLETE]') && !hasCompletedRef.current) {
         hasCompletedRef.current = true;
-        handleComplete();
+        // Calculate delay based on message length for typewriter effect (10ms per char) + buffer
+        const cleanContent = assistantContent.replace(/\[.*?\]/g, '').trim();
+        const typingDelay = Math.max(cleanContent.length * 10 + 1000, 2000); // At least 2s, plus time for typing
+        setTimeout(() => handleComplete(), typingDelay);
       }
 
     } catch (error) {
