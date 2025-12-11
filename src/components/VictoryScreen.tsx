@@ -3,57 +3,7 @@
 import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { StarBackground } from './StarBackground';
-
-interface LeaderboardEntry {
-  full_name: string;
-  company_name?: string;
-  challenge_attempts: number;
-  completed_at: string;
-  challenge_started_at: string;
-  email?: string;
-}
-
-function formatDuration(startTime: string, endTime: string): string {
-  if (!startTime || !endTime) return '--';
-  
-  const start = new Date(startTime).getTime();
-  const end = new Date(endTime).getTime();
-  
-  if (isNaN(start) || isNaN(end)) return '--';
-  
-  const seconds = Math.floor((end - start) / 1000);
-  
-  if (seconds < 0) return '--';
-  if (seconds < 60) return `${seconds}s`;
-  
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}m${remainingSeconds}s`;
-}
-
-function formatLeaderboardName(entry: LeaderboardEntry, index: number): string {
-  const firstName = entry.full_name?.split(' ')[0]?.toUpperCase();
-  const companyName = entry.company_name?.toUpperCase();
-  
-  if (!firstName) {
-    // Generate a fun hacker name with random number if no name available
-    const hackerNames = [
-      'AGENT', 'HACKER', 'GHOST', 'CIPHER', 'SHADOW', 'ZERO', 'PHOENIX', 'VIPER',
-      'ROGUE', 'STORM', 'BYTE', 'PIXEL', 'NEXUS', 'VECTOR', 'PULSE', 'NOVA',
-      'APEX', 'BLADE', 'CRYPTO', 'DELTA', 'ECHO', 'FLUX', 'GLITCH', 'HELIX',
-      'ION', 'JADE', 'KARMA', 'LYNX', 'MATRIX', 'NEON', 'OMEGA', 'PRISM'
-    ];
-    const baseName = hackerNames[index % hackerNames.length];
-    const randomNum = Math.floor(Math.random() * 900) + 100; // 100-999
-    return `${baseName}_${randomNum}`;
-  }
-  
-  if (companyName) {
-    return `${firstName} from ${companyName}`;
-  }
-  
-  return firstName;
-}
+import { Leaderboard } from './Leaderboard';
 
 interface VictoryScreenProps {
   sessionData: {
@@ -72,7 +22,6 @@ export function VictoryScreen({
   onLinkedInClick 
 }: VictoryScreenProps) {
   const [showContent, setShowContent] = useState(false);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
   const attempts = sessionData.challenge_attempts || 1;
 
@@ -87,12 +36,6 @@ export function VictoryScreen({
 
     // Delay content reveal
     setTimeout(() => setShowContent(true), 500);
-
-    // Fetch leaderboard
-    fetch('/api/leaderboard')
-      .then(res => res.json())
-      .then(data => setLeaderboard(data.leaderboard || []))
-      .catch(console.error);
   }, []);
 
   return (
@@ -128,57 +71,14 @@ export function VictoryScreen({
           </div>
           
           {/* Leaderboard */}
-          {leaderboard.length > 0 && (
-            <div className="border-4 border-keen-cyan bg-keen-darkblue p-3 sm:p-4 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <img 
-                  src="https://ztespqmrsydpdxtdaytd.supabase.co/storage/v1/object/public/public-webrix/trophy-image.png" 
-                  alt="Trophy" 
-                  className="w-5 h-5 sm:w-6 sm:h-6 object-contain"
-                />
-                <p className="text-keen-cyan font-pixel text-xs sm:text-sm text-center">
-                  LEADERBOARD
-                </p>
-              </div>
-              <div className="space-y-2">
-                {leaderboard.slice(0, 10).map((entry, index) => {
-                  const isCurrentUser = entry.email === sessionData.email;
-                  return (
-                    <div 
-                      key={index}
-                      className={`flex justify-between items-center px-2 py-2 ${
-                        isCurrentUser 
-                          ? 'bg-keen-yellow/20 border-2 border-keen-yellow animate-pulse' 
-                          : 'border border-keen-darkblue'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className={`font-pixel text-xs shrink-0 ${
-                          index === 0 ? 'text-keen-yellow' : 
-                          index === 1 ? 'text-keen-gray' : 
-                          index === 2 ? 'text-orange-400' : 'text-keen-green'
-                        }`}>
-                          {index + 1}.
-                        </span>
-                        <span className={`font-pixel text-xs truncate ${isCurrentUser ? 'text-keen-yellow' : 'text-keen-green'}`}>
-                          {formatLeaderboardName(entry, index)}
-                          {isCurrentUser && ' (YOU)'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0 ml-2">
-                        <span className="font-pixel text-xs text-keen-magenta">
-                          {formatDuration(entry.challenge_started_at, entry.completed_at)}
-                        </span>
-                        <span className="font-pixel text-xs text-keen-cyan whitespace-nowrap">
-                          {entry.challenge_attempts}x
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          <div className="mb-4 sm:mb-6">
+            <Leaderboard 
+              maxEntries={10}
+              currentUserEmail={sessionData.email}
+              showTitle={true}
+              titleSize="sm"
+            />
+          </div>
           
           {/* Instructions */}
           <div className="text-center mb-4 sm:mb-6">

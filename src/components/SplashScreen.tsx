@@ -165,7 +165,7 @@ export function SplashScreen({ onStart, isLoading }: SplashScreenProps) {
         className="mt-8 sm:mt-12 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity align-center"
       >
         <span className="text-keen-gray font-pixel text-[8px] sm:text-xs my-auto">POWERED BY</span>
-        <PixelLogo className="h-3 sm:h-4" />
+        <PixelLogo className="" />
       </a>
       
       {/* Ready indicator - hidden on very small screens */}

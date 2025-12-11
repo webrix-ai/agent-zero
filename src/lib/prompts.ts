@@ -152,7 +152,7 @@ This is how most orgs run AI agents today. 😬
 
 [OPTION:See how this could have been different with Webrix]"
 
-IF THE USER CLICKS THE OPTION (they sent anything like "See how this could have been different" or similar message):
+IF THE USER CLICKS THE OPTION (they sent anything like "Show me how this could have been different" or similar message):
 Respond with ONLY: "[PHASE:showcase]"
 
 This triggers the transition to the next phase.`,
@@ -167,6 +167,8 @@ IF THIS IS THE FIRST MESSAGE IN THIS PHASE:
 Respond with the Webrix solution:
 
 "🛡️ WITH WEBRIX, THIS NEVER HAPPENS
+
+Already deployed at enterprises like Wix.com - their team loves us. Perhaps you will too! 💜
 
 ━━ FINE-GRAINED ACCESS ━━
 ┌─────────────────────────┐
@@ -187,6 +189,9 @@ Agents only do what you allow!
 │ [✓ Approve] [✗ Deny]   │
 └─────────────────────────┘
 Security reviews every tool.
+
+━━ BUILT-IN IDP & SSO ━━
+One MCP Gateway for your org - connected to all your MCPs. SSO login via Okta, Azure AD, or any IdP.
 
 ━━ REAL-TIME GUARDRAILS ━━
 Policies that block risky actions BEFORE they execute.
