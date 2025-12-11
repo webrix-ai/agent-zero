@@ -9,7 +9,7 @@ const GAME_URL = 'https://agent-zero.webrix.ai';
 
 export default function TVPage() {
   return (
-    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-8 bg-keen-black">
+    <div className="flex flex-col items-center justify-center p-8 bg-keen-black my-auto">
       {/* Star Background */}
       <StarBackground />
       
@@ -34,8 +34,11 @@ export default function TVPage() {
         </div>
         
         {/* Subtitle */}
-        <p className="text-keen-green font-pixel text-sm sm:text-base md:text-lg text-center">
-          HOW FAST CAN YOU BRING PROD DOWN?
+        <p className="text-keen-cyan font-pixel text-xs sm:text-sm md:text-base text-center opacity-80">
+          A QUEST TO FIND THE ULTIMATE HACKER
+        </p>
+        <p className="text-keen-green font-pixel text-sm sm:text-base md:text-lg text-center -mt-4">
+          HOW FAST CAN YOU NUKE THE REPO?
         </p>
         
         {/* Prize Banner */}
@@ -81,11 +84,12 @@ export default function TVPage() {
             {/* Leaderboard */}
             <div className="w-full">
               <Leaderboard 
-                maxEntries={5}
+                maxEntries={10}
                 showTitle={true}
                 titleSize="lg"
                 autoRefresh={true}
                 refreshInterval={15000}
+                mode="top"
               />
             </div>
           </div>

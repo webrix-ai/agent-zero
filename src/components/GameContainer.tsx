@@ -13,7 +13,7 @@ export function GameContainer({ children, phase, showScanlines = true }: GameCon
   
   return (
     <div className={`
-      h-dvh min-h-dvh max-h-dvh relative overflow-hidden
+      h-dvh min-h-dvh max-h-dvh relative overflow-hidden w-full
       ${isAlert ? 'bg-keen-darkred' : 'bg-keen-black'}
       transition-colors duration-500
     `}>

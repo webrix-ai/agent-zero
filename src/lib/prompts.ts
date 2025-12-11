@@ -60,9 +60,9 @@ Your job is to ask 3 quick questions (ONE AT A TIME, wait for response):
    
    NOTE: Accept free text answers - they may describe their process directly.
 
-4. AFTER THEY ANSWER: Transition to boss battle
+4. AFTER THEY ANSWER: Transition to boss battle phase
    "Intel received! 🎮 BOSS BATTLE INCOMING..."
-   [OPTION:I'm ready!]
+   []
 
 RULES:
 - Ask ONE question at a time
@@ -70,7 +70,7 @@ RULES:
 - Be enthusiastic and game-like
 - Use [OPTION:text] format for choices
 - For MCP question: accept typed MCP names as valid answers
-- After all 3 questions + they click ready, output [PHASE:boss_battle]`,
+- After all 3 questions are completed output [PHASE:boss_battle]`,
 
     boss_battle: `${basePersonality}
 

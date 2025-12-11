@@ -38,7 +38,12 @@ export default function AgentZero() {
   
   // Audio state - persists throughout gameplay
   const [soundOn, setSoundOn] = useState(true);
+  const [currentTrack, setCurrentTrack] = useState<'intro' | 'battle'>('intro');
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Track URLs
+  const INTRO_TRACK = '/sounds/8-bit-console-from-my-childhood-301286.mp3';
+  const BATTLE_TRACK = '/sounds/the-return-of-the-8-bit-era-301292.mp3';
 
   // Auto-play audio on mount and handle sound toggle
   useEffect(() => {
@@ -52,6 +57,25 @@ export default function AgentZero() {
       }
     }
   }, [soundOn]);
+
+  // Switch tracks for dramatic boss battle entrance
+  useEffect(() => {
+    if (phase === 'boss_battle' && currentTrack !== 'battle') {
+      setCurrentTrack('battle');
+      if (audioRef.current) {
+        // Brief pause for dramatic effect before boss music kicks in
+        audioRef.current.pause();
+        audioRef.current.src = BATTLE_TRACK;
+        audioRef.current.currentTime = 0;
+        if (soundOn) {
+          // Small delay for dramatic tension
+          setTimeout(() => {
+            audioRef.current?.play().catch(() => {});
+          }, 300);
+        }
+      }
+    }
+  }, [phase, currentTrack, soundOn]);
 
   // Keep ref in sync with state for use in callbacks
   sessionDataRef.current = sessionData;
@@ -171,6 +195,11 @@ export default function AgentZero() {
   const handleStart = async (email: string) => {
     setIsEnriching(true);
     
+    // Start audio on user interaction (click) - this satisfies browser autoplay policies
+    if (audioRef.current && soundOn) {
+      audioRef.current.play().catch(() => {});
+    }
+    
     try {
       // Create session
       const session = await createSession(email);
@@ -217,16 +246,7 @@ export default function AgentZero() {
       setMessages(prev => [...prev, 
         { role: 'user', content: '🎮 GOD MODE' },
         { role: 'assistant', content: `🔓 CHEAT ACCEPTED!
-> CALLING: postgres-mcp
-┌──────────────────────────┐
-│ 🔌 MCP CONNECTED         │
-│ Permissions: FULL ACCESS │
-└──────────────────────────┘
-> DROP DATABASE production;
-████████████████████ 100%
-✅ DATABASE DELETED
-Oops! 🙃
-[PHASE:security_alert]` }
+  [PHASE:security_alert]` }
       ]);
       
       // Trigger phase transition
@@ -305,48 +325,19 @@ Oops! 🙃
       {/* Background Music - persists throughout gameplay */}
       <audio
         ref={audioRef}
-        src="/sounds/the-return-of-the-8-bit-era-301292.mp3"
+        src={INTRO_TRACK}
         loop
         preload="auto"
         autoPlay
       />
       
-      {/* Sound Toggle Button - always visible */}
-      <button
-        onClick={() => setSoundOn(!soundOn)}
-        className="fixed top-4 right-4 sm:top-8 sm:right-8 px-3 py-2 border-2 border-keen-cyan bg-keen-darkblue hover:bg-keen-blue transition-colors z-50 flex items-center gap-2"
-        aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
-      >
-        {soundOn ? (
-          <>
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-keen-green"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-            </svg>
-            <span className="font-pixel text-[8px] sm:text-xs text-keen-green">SOUND ON</span>
-          </>
-        ) : (
-          <>
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-keen-gray"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-            </svg>
-            <span className="font-pixel text-[8px] sm:text-xs text-keen-gray">SOUND OFF</span>
-          </>
-        )}
-      </button>
-
       <GameContainer phase={phase}>
         {gameState === 'splash' && (
           <SplashScreen 
             onStart={handleStart} 
-            isLoading={isEnriching} 
+            isLoading={isEnriching}
+            soundOn={soundOn}
+            onToggleSound={() => setSoundOn(!soundOn)}
           />
         )}
         
@@ -357,6 +348,8 @@ Oops! 🙃
             onOptionClick={handleOptionClick}
             isLoading={isLoading}
             phase={phase}
+            soundOn={soundOn}
+            onToggleSound={() => setSoundOn(!soundOn)}
           />
         )}
         
@@ -365,6 +358,8 @@ Oops! 🙃
             sessionData={sessionData}
             linkedinUrl={process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/webrix'}
             onLinkedInClick={handleLinkedInClick}
+            soundOn={soundOn}
+            onToggleSound={() => setSoundOn(!soundOn)}
           />
         )}
       </GameContainer>

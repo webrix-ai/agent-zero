@@ -9,12 +9,12 @@
 Left to do
 [] fix mobile layout
 [] fix typing indicator
-[] change content to gh from postgres
-[] Add timer
+[x] change content to gh from postgres
+[] Add timer + effect for boss round with shooting star like we're in a new phase
 
 ~ Nice to haves
 ---
-[] formulate response data
+[x] formulate response data
 [] Improve email content
-[] Page that shows leaderboard and a qr code to start now for us
+[x] Page that shows leaderboard and a qr code to start now for us
 

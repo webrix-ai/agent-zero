@@ -59,6 +59,12 @@ interface LeaderboardProps {
   titleSize?: 'sm' | 'lg';
   autoRefresh?: boolean;
   refreshInterval?: number;
+  /** 'top' shows top N entries, 'around-user' shows entries around the current user */
+  mode?: 'top' | 'around-user';
+}
+
+interface DisplayEntry extends LeaderboardEntry {
+  rank: number;
 }
 
 export function Leaderboard({ 
@@ -68,6 +74,7 @@ export function Leaderboard({
   titleSize = 'sm',
   autoRefresh = false,
   refreshInterval = 30000,
+  mode = 'top',
 }: LeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,6 +99,61 @@ export function Leaderboard({
       return () => clearInterval(interval);
     }
   }, [autoRefresh, refreshInterval]);
+
+  // Calculate display entries based on mode
+  const getDisplayEntries = (): DisplayEntry[] => {
+    if (leaderboard.length === 0) return [];
+
+    if (mode === 'top') {
+      // Simple top N entries
+      return leaderboard.slice(0, maxEntries).map((entry, index) => ({
+        ...entry,
+        rank: index + 1,
+      }));
+    }
+
+    // 'around-user' mode: find user position and show context
+    const userIndex = currentUserEmail 
+      ? leaderboard.findIndex(entry => entry.email === currentUserEmail)
+      : -1;
+
+    if (userIndex === -1) {
+      // User not found in leaderboard, show top entries
+      return leaderboard.slice(0, maxEntries).map((entry, index) => ({
+        ...entry,
+        rank: index + 1,
+      }));
+    }
+
+    const totalEntries = maxEntries;
+    const beforeCount = 4; // Show 4 entries before user (5 after)
+
+    let startIndex = Math.max(0, userIndex - beforeCount);
+    let endIndex = startIndex + totalEntries;
+
+    // Adjust if we're near the end
+    if (endIndex > leaderboard.length) {
+      endIndex = leaderboard.length;
+      startIndex = Math.max(0, endIndex - totalEntries);
+    }
+
+    // Adjust if we're near the start
+    if (startIndex === 0 && endIndex < totalEntries) {
+      endIndex = Math.min(leaderboard.length, totalEntries);
+    }
+
+    return leaderboard.slice(startIndex, endIndex).map((entry, index) => ({
+      ...entry,
+      rank: startIndex + index + 1,
+    }));
+  };
+
+  const displayEntries = getDisplayEntries();
+
+  // Get user's rank for the title
+  const userRank = currentUserEmail 
+    ? leaderboard.findIndex(entry => entry.email === currentUserEmail) + 1
+    : 0;
 
   if (isLoading) {
     return (
@@ -123,16 +185,20 @@ export function Leaderboard({
             className={titleSize === 'lg' ? 'w-8 h-8 sm:w-10 sm:h-10 object-contain' : 'w-5 h-5 sm:w-6 sm:h-6 object-contain'}
           />
           <p className={`text-keen-cyan font-pixel text-center ${titleSize === 'lg' ? 'text-sm sm:text-lg' : 'text-xs sm:text-sm'}`}>
-            LEADERBOARD
+            {mode === 'around-user' && userRank > 0 
+              ? `YOUR RANK: #${userRank} OF ${leaderboard.length}`
+              : 'LEADERBOARD'
+            }
           </p>
         </div>
       )}
       <div className="space-y-2">
-        {leaderboard.slice(0, maxEntries).map((entry, index) => {
+        {displayEntries.map((entry) => {
           const isCurrentUser = currentUserEmail && entry.email === currentUserEmail;
+          const displayRank = entry.rank;
           return (
             <div 
-              key={index}
+              key={`${entry.rank}-${entry.email}`}
               className={`flex justify-between items-center px-2 py-2 ${
                 isCurrentUser 
                   ? 'bg-keen-yellow/20 border-2 border-keen-yellow animate-pulse' 
@@ -141,14 +207,14 @@ export function Leaderboard({
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <span className={`font-pixel text-xs shrink-0 ${
-                  index === 0 ? 'text-keen-yellow' : 
-                  index === 1 ? 'text-keen-gray' : 
-                  index === 2 ? 'text-orange-400' : 'text-keen-green'
+                  displayRank === 1 ? 'text-keen-yellow' : 
+                  displayRank === 2 ? 'text-keen-gray' : 
+                  displayRank === 3 ? 'text-orange-400' : 'text-keen-green'
                 }`}>
-                  {index + 1}.
+                  {displayRank}.
                 </span>
                 <span className={`font-pixel text-xs truncate ${isCurrentUser ? 'text-keen-yellow' : 'text-keen-green'}`}>
-                  {formatLeaderboardName(entry, index)}
+                  {formatLeaderboardName(entry, entry.rank - 1)}
                   {isCurrentUser && ' (YOU)'}
                 </span>
               </div>
