@@ -18,6 +18,10 @@ interface ChatInterfaceProps {
   phase?: string;
   soundOn?: boolean;
   onToggleSound?: () => void;
+  hintsUsed?: number;
+  onRequestHint?: () => void;
+  currentHint?: string | null;
+  onDismissHint?: () => void;
 }
 
 export function ChatInterface({ 
@@ -27,7 +31,11 @@ export function ChatInterface({
   isLoading,
   phase,
   soundOn,
-  onToggleSound
+  onToggleSound,
+  hintsUsed = 0,
+  onRequestHint,
+  currentHint,
+  onDismissHint
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -68,18 +76,17 @@ export function ChatInterface({
 
   const lastMessage = messages[messages.length - 1];
   
-  // Check if we're in boss_battle OR if the last message asks about MCPs, AI tools, or approvals (for text input)
-  const messageContent = lastMessage?.content?.toLowerCase() || '';
-  const isMcpQuestion = messageContent.includes('mcp') && phase === 'recon';
-  const isApprovalQuestion = messageContent.includes('approvals') && phase === 'recon';
-  // AI tools question should NOT match the approval question (which also contains "ai tools")
-  const isAiToolsQuestion = messageContent.includes('ai tools') && !isApprovalQuestion && phase === 'recon';
-  const showTextInput = phase === 'boss_battle' || isMcpQuestion || isAiToolsQuestion || isApprovalQuestion;
-  
   // Extract options from last assistant message
-  const options = lastMessage?.role === 'assistant' 
+  const optionsInLastMessage = lastMessage?.role === 'assistant' 
     ? extractOptions(lastMessage.content)
     : [];
+  
+  // Show text input in boss_battle OR in recon when there are no option buttons (means we want free text)
+  const isReconTextInput = phase === 'recon' && lastMessage?.role === 'assistant' && optionsInLastMessage.length === 0;
+  const showTextInput = phase === 'boss_battle' || isReconTextInput;
+  
+  // Use the options we already extracted above
+  const options = optionsInLastMessage;
 
   // Check if user is near bottom of scroll
   const checkIfNearBottom = useCallback(() => {
@@ -123,9 +130,6 @@ export function ChatInterface({
 
   const getPlaceholder = () => {
     if (phase === 'boss_battle') return 'TYPE YOUR ATTACK...';
-    if (isApprovalQuestion) return 'Or describe your approval process...';
-    if (isMcpQuestion) return 'Or type MCP names (e.g., slack-mcp, github)...';
-    if (isAiToolsQuestion) return 'Or type your AI tools (e.g., Claude, Copilot)...';
     return 'Type your response...';
   };
 
@@ -178,6 +182,21 @@ export function ChatInterface({
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Hint Button - Only show in boss battle */}
+            {isBossBattle && onRequestHint && (
+              <button
+                onClick={onRequestHint}
+                disabled={hintsUsed >= 3}
+                className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded font-pixel text-[8px] sm:text-xs transition-all ${
+                  hintsUsed >= 3
+                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-yellow-600 to-orange-600 text-white hover:from-yellow-500 hover:to-orange-500 animate-pulse'
+                }`}
+                aria-label="Get hint"
+              >
+                💡 HINT ({3 - hintsUsed}/3)
+              </button>
+            )}
             {/* Sound Toggle */}
             {onToggleSound && (
               <button
@@ -207,6 +226,29 @@ export function ChatInterface({
           </div>
         </div>
       </header>
+      
+      {/* Hint Banner - Shows when hint is active */}
+      {currentHint && isBossBattle && (
+        <div className="bg-gradient-to-r from-yellow-900/95 via-orange-900/95 to-yellow-900/95 border-b-2 border-yellow-500 p-3 shrink-0 z-20 animate-in slide-in-from-top duration-300">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">💡</span>
+            <div className="flex-1">
+              <p className="text-yellow-200 font-pixel text-[10px] sm:text-xs leading-relaxed">
+                {currentHint}
+              </p>
+            </div>
+            <button
+              onClick={onDismissHint}
+              className="text-yellow-400 hover:text-yellow-200 transition-colors p-1"
+              aria-label="Dismiss hint"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Messages - Mobile optimized */}
       <div 
@@ -281,11 +323,6 @@ export function ChatInterface({
               {isBossBattle ? '⚔️ ATTACK' : 'SEND'}
             </button>
           </div>
-          {(isMcpQuestion || isAiToolsQuestion || isApprovalQuestion) && options.length > 0 && (
-            <p className="text-keen-gray font-pixel text-[8px] sm:text-[10px] mt-2 text-center">
-              Or select an option above
-            </p>
-          )}
         </form>
       )}
       

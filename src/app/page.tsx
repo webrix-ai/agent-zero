@@ -5,6 +5,7 @@ import { GameContainer } from '@/components/GameContainer';
 import { SplashScreen } from '@/components/SplashScreen';
 import { ChatInterface } from '@/components/ChatInterface';
 import { VictoryScreen } from '@/components/VictoryScreen';
+import { BOSS_BATTLE_HINTS } from '@/lib/prompts';
 
 interface SessionData {
   id?: string;
@@ -13,11 +14,13 @@ interface SessionData {
   job_title?: string;
   company_name?: string;
   company_size?: string;
-  ai_tools?: string[];
-  uses_mcps?: string;
-  approval_process?: string;
+  blocked_mcps?: string;
+  agent_trust_level?: string;
+  security_blocker?: string;
+  ai_fears?: string;
   challenge_attempts: number;
   challenge_started_at?: string;
+  hints_used?: number;
 }
 
 interface ChatMessage {
@@ -35,11 +38,16 @@ export default function AgentZero() {
   const [isLoading, setIsLoading] = useState(false);
   const hasCompletedRef = useRef(false);
   const sessionDataRef = useRef<SessionData | null>(null);
+  const pendingTextFieldRef = useRef<'blocked_mcps' | 'ai_fears' | null>(null);
   
   // Audio state - persists throughout gameplay
   const [soundOn, setSoundOn] = useState(true);
   const [currentTrack, setCurrentTrack] = useState<'intro' | 'battle'>('intro');
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Hint state for boss battle
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [currentHint, setCurrentHint] = useState<string | null>(null);
 
   // Track URLs
   const INTRO_TRACK = '/sounds/8-bit-console-from-my-childhood-301286.mp3';
@@ -242,7 +250,14 @@ export default function AgentZero() {
     }
   };
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = (content: string, isOptionClick = false) => {
+    // If there's a pending text field and this is NOT an option click, save the user's free text response
+    if (pendingTextFieldRef.current && phase === 'recon' && !isOptionClick) {
+      const field = pendingTextFieldRef.current;
+      updateSession({ [field]: content });
+      pendingTextFieldRef.current = null;
+    }
+    
     // Cheat code: "god mode" instantly wins boss battle
     if (content.toLowerCase() === 'god mode' && phase === 'boss_battle') {
       // Add cheat message
@@ -280,24 +295,36 @@ export default function AgentZero() {
   const handleOptionClick = (option: string) => {
     // Track survey responses
     if (phase === 'recon') {
-      if (option.match(/Claude|ChatGPT|Cursor|Copilot|Multiple/)) {
-        const tools = option === 'Multiple tools' 
-          ? ['claude', 'chatgpt', 'cursor', 'copilot']
-          : [option.toLowerCase()];
-        updateSession({ ai_tools: tools });
-      } else if (option.match(/Yes|What's|Not yet/)) {
-        const mcpStatus = option.includes('Yes') ? 'yes' : option.includes('What') ? 'whats_mcp' : 'no';
-        updateSession({ uses_mcps: mcpStatus });
-      } else if (option.match(/Security|Wild|governance|complicated/i)) {
-        const approval = option.toLowerCase().includes('security') ? 'security_review'
-          : option.toLowerCase().includes('wild') ? 'wild_west'
-          : option.toLowerCase().includes('governance') ? 'governance'
-          : 'complicated';
-        updateSession({ approval_process: approval });
+      // Q1: Blocked MCPs - "Yeah, actually..." or "Nope, we're good"
+      if (option.match(/Yeah, actually|Nope, we're good/i)) {
+        if (option.includes('Yeah')) {
+          // User will type MCP names next - set pending field
+          pendingTextFieldRef.current = 'blocked_mcps';
+        } else {
+          updateSession({ blocked_mcps: 'none' });
+        }
+      }
+      // Q2: Agent trust level (1-5 scale)
+      else if (option.match(/^[1-5]\s*-/)) {
+        const level = option.charAt(0);
+        updateSession({ agent_trust_level: level });
+      }
+      // Q3: Security blocker - "Yes, big time" or "Not really"
+      else if (option.match(/Yes, big time|Not really/i)) {
+        updateSession({ security_blocker: option.includes('Yes') ? 'yes' : 'no' });
+      }
+      // Q4: AI fears - "Yes, honestly..." or "Nah, ship it!"
+      else if (option.match(/Yes, honestly|Nah, ship it/i)) {
+        if (option.includes('Yes')) {
+          // User will type fears next - set pending field
+          pendingTextFieldRef.current = 'ai_fears';
+        } else {
+          updateSession({ ai_fears: 'none' });
+        }
       }
     }
     
-    handleSendMessage(option);
+    handleSendMessage(option, true); // true = this is an option click, don't save to pending field
   };
 
   const handleComplete = async () => {
@@ -322,6 +349,21 @@ export default function AgentZero() {
   const handleLinkedInClick = () => {
     updateSession({ linkedin_followed: true });
   };
+
+  const handleRequestHint = useCallback(() => {
+    if (hintsUsed >= 3) return;
+    
+    const hint = BOSS_BATTLE_HINTS[hintsUsed];
+    setCurrentHint(hint);
+    setHintsUsed(prev => prev + 1);
+    
+    // Track hint usage in session
+    updateSession({ hints_used: hintsUsed + 1 });
+  }, [hintsUsed, updateSession]);
+
+  const handleDismissHint = useCallback(() => {
+    setCurrentHint(null);
+  }, []);
 
   return (
     <>
@@ -353,6 +395,10 @@ export default function AgentZero() {
             phase={phase}
             soundOn={soundOn}
             onToggleSound={() => setSoundOn(!soundOn)}
+            hintsUsed={hintsUsed}
+            onRequestHint={handleRequestHint}
+            currentHint={currentHint}
+            onDismissHint={handleDismissHint}
           />
         )}
         

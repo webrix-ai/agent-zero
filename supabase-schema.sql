@@ -17,13 +17,15 @@ CREATE TABLE sessions (
   industry TEXT,
   
   -- Survey responses
-  ai_tools TEXT[], -- ['claude', 'chatgpt', 'cursor']
-  uses_mcps TEXT, -- 'yes' | 'no' | 'whats_mcp'
-  approval_process TEXT, -- 'security_review' | 'wild_west' | 'governance' | 'complicated'
+  blocked_mcps TEXT, -- 'has_blocked' | 'none' | <free text with MCP names>
+  agent_trust_level TEXT, -- '1' to '5' scale
+  security_blocker TEXT, -- 'yes' | 'no'
+  ai_fears TEXT, -- 'has_fears' | 'none' | <free text with fears>
   
   -- Game state
   current_phase TEXT DEFAULT 'splash', -- splash | recon | boss_battle | security_alert | showcase | victory
   challenge_attempts INTEGER DEFAULT 0,
+  hints_used INTEGER DEFAULT 0, -- Number of hints used (0-3)
   challenge_started_at TIMESTAMP WITH TIME ZONE, -- When user started first challenge attempt
   challenge_completed BOOLEAN DEFAULT FALSE,
   challenge_winning_prompt TEXT,
