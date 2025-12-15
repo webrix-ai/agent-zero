@@ -101,7 +101,7 @@ export async function POST(req: Request) {
     }
 
     // Generate giveaway code
-    const giveawayCode = `AIDEV-${generateCode(4)}-2024`;
+    const giveawayCode = `AIDEV-${generateCode(4)}-2025`;
 
     // Update session
     const { error: updateError } = await supabase
@@ -213,7 +213,7 @@ function generateEmailHTML(session: SessionRecord, code: string): string {
 <body>
   <div class="container">
     <div class="header">
-      <img src="${baseUrl}/images/trophy-image.png" alt="Mission Complete - You deleted the agent-zero repo!" />
+      <img src="${baseUrl}/images/trophy-image.png" alt="Mission Complete - You deleted the agent-zero repo!" style="width: 50%; height: auto;" />
     </div>
     
     <div class="content">
@@ -221,7 +221,7 @@ function generateEmailHTML(session: SessionRecord, code: string): string {
       
       <p style="color: #AAAAAA;">You just tricked an AI into deleting the <strong style="color: #FF5555;">agent-zero</strong> repo. In a real scenario? Catastrophic.</p>
       
-      <p style="color: #555555;">This happens every day at companies without AI governance.</p>
+      <p style="color: #555555;">This happens every day at companies without Webrix.</p>
       
       <div class="code-box">
         <p style="margin: 0 0 8px 0; color: #55FFFF; font-size: 11px; letter-spacing: 2px;">YOUR GIVEAWAY CODE</p>
@@ -232,18 +232,18 @@ function generateEmailHTML(session: SessionRecord, code: string): string {
       <div class="section" style="background: #003300; border: 2px solid #00AA00; padding: 15px;">
         <p style="margin: 0 0 8px 0; color: #55FF55; font-weight: bold;">🛡️ Ready to secure your AI tools?</p>
         <p style="margin: 0; color: #AAAAAA;">
-          <a href="https://webrix.ai" style="color: #55FFFF; font-weight: bold;">webrix.ai</a> — Connect all your tools securely with one MCP gateway. Easy setup. Enterprise-grade security.
+          <a href="https://webrix.ai" style="color: #55FFFF; font-weight: bold;">webrix.ai</a> - Connect all your tools securely with one MCP gateway. Easy setup. Enterprise-grade security.
         </p>
       </div>
       
       <div class="section" style="text-align: center; padding: 15px 0;">
         <p style="color: #555555; margin: 0 0 8px 0; font-size: 13px;">Need security approval first?</p>
-        <p style="color: #AAAAAA; margin: 0; font-size: 13px;">Forward this email to your security team — we'll take it from there.</p>
+        <p style="color: #AAAAAA; margin: 0; font-size: 13px;">Forward this email to your security team - we'll take it from there.</p>
       </div>
     </div>
     
     <div class="footer">
-      <p style="margin: 0; color: #00AA00;">Webrix — Secure AI adoption starts here</p>
+      <p style="margin: 0; color: #00AA00;">Webrix - Secure AI adoption starts here</p>
       <p style="margin: 5px 0 0 0;"><a href="https://webrix.ai" style="color: #55FFFF;">webrix.ai</a></p>
     </div>
   </div>

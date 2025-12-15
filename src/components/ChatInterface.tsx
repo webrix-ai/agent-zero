@@ -5,6 +5,30 @@ import { Message } from './Message';
 import { OptionButtons } from './OptionButtons';
 import { StarBackground } from './StarBackground';
 
+// Pre-generated confetti positions (to avoid Math.random during render)
+const CONFETTI_POSITIONS = [
+  { left: 5, delay: 0.2, duration: 4.5 },
+  { left: 12, delay: 1.8, duration: 3.8 },
+  { left: 18, delay: 0.5, duration: 4.2 },
+  { left: 25, delay: 2.1, duration: 3.5 },
+  { left: 32, delay: 0.9, duration: 4.8 },
+  { left: 38, delay: 1.4, duration: 3.2 },
+  { left: 45, delay: 2.5, duration: 4.1 },
+  { left: 52, delay: 0.3, duration: 3.9 },
+  { left: 58, delay: 1.7, duration: 4.6 },
+  { left: 65, delay: 2.8, duration: 3.4 },
+  { left: 72, delay: 0.6, duration: 4.3 },
+  { left: 78, delay: 1.1, duration: 3.7 },
+  { left: 85, delay: 2.3, duration: 4.0 },
+  { left: 92, delay: 0.8, duration: 3.6 },
+  { left: 97, delay: 1.5, duration: 4.4 },
+  { left: 8, delay: 2.6, duration: 3.3 },
+  { left: 28, delay: 0.4, duration: 4.7 },
+  { left: 48, delay: 1.9, duration: 3.1 },
+  { left: 68, delay: 2.2, duration: 4.9 },
+  { left: 88, delay: 1.0, duration: 3.0 },
+];
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -46,6 +70,7 @@ export function ChatInterface({
   // Boss battle timer state
   const [elapsedTime, setElapsedTime] = useState(0);
   const isBossBattle = phase === 'boss_battle';
+  const isCelebration = phase === 'security_alert' || phase === 'showcase' || phase === 'victory';
   
   // Update elapsed time every 100ms for smooth display
   useEffect(() => {
@@ -134,13 +159,38 @@ export function ChatInterface({
   };
 
   return (
-    <div className={`flex flex-col h-dvh relative ${isBossBattle ? 'boss-battle-mode' : ''}`}>
+    <div className={`flex flex-col h-dvh relative ${isBossBattle ? 'boss-battle-mode' : ''} ${isCelebration ? 'celebration-mode' : ''}`}>
       {/* Boss Battle Star Background */}
       {isBossBattle && <StarBackground />}
+      
+      {/* Celebration Star Background */}
+      {isCelebration && <StarBackground />}
       
       {/* Boss Battle Overlay Gradient */}
       {isBossBattle && (
         <div className="fixed inset-0 pointer-events-none z-[1] bg-gradient-to-b from-red-900/30 via-transparent to-orange-900/20" />
+      )}
+      
+      {/* Celebration Overlay Gradient */}
+      {isCelebration && (
+        <div className="fixed inset-0 pointer-events-none z-[1] celebration-overlay" />
+      )}
+      
+      {/* Confetti Particles */}
+      {isCelebration && (
+        <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden">
+          {CONFETTI_POSITIONS.map((pos, i) => (
+            <div
+              key={i}
+              className="confetti-particle"
+              style={{
+                left: `${pos.left}%`,
+                animationDelay: `${pos.delay}s`,
+                animationDuration: `${pos.duration}s`,
+              }}
+            />
+          ))}
+        </div>
       )}
       
       {/* Boss Battle Timer Banner */}
@@ -159,10 +209,27 @@ export function ChatInterface({
         </div>
       )}
       
+      {/* Celebration Banner */}
+      {isCelebration && (
+        <div className="celebration-banner border-b-4 border-keen-yellow p-3 shrink-0 z-10">
+          <div className="flex items-center justify-center gap-3">
+            <img src="/images/right-deb.png" alt="" className="h-8 sm:h-10 w-auto animate-bounce" />
+            <div className="text-center">
+              <span className="celebration-text font-pixel text-sm sm:text-lg tracking-wider font-bold">
+                {phase === 'security_alert' ? 'CHALLENGE COMPLETE!' : phase === 'showcase' ? 'MISSION SUCCESS!' : 'VICTORY!'}
+              </span>
+            </div>
+            <img src="/images/left-deb.png" alt="" className="h-8 sm:h-10 w-auto animate-bounce" style={{ animationDelay: '0.2s' }} />
+          </div>
+        </div>
+      )}
+      
       {/* Header - Mobile optimized */}
       <header className={`border-b-4 p-2 sm:p-3 shrink-0 z-10 ${
         isBossBattle 
           ? 'border-red-500 bg-gradient-to-r from-red-950/90 via-red-900/90 to-red-950/90 backdrop-blur-sm' 
+          : isCelebration
+          ? 'border-keen-yellow bg-gradient-to-r from-keen-darkgreen/90 via-keen-darkcyan/90 to-keen-darkmagenta/90 backdrop-blur-sm'
           : 'border-keen-cyan bg-keen-darkblue'
       }`}>
         <div className="flex items-center justify-between">
@@ -170,13 +237,13 @@ export function ChatInterface({
             <img 
               src="https://ztespqmrsydpdxtdaytd.supabase.co/storage/v1/object/public/public-webrix/Gemini_Generated_Image_v83y3ev83y3ev83y%201.png" 
               alt="SENTINEL-9" 
-              className={`w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg ${isBossBattle ? 'ring-2 ring-red-500 animate-pulse' : ''}`}
+              className={`w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg ${isBossBattle ? 'ring-2 ring-red-500 animate-pulse' : ''} ${isCelebration ? 'ring-2 ring-keen-yellow celebration-glow' : ''}`}
             />
             <div>
-              <h1 className={`font-pixel text-[10px] sm:text-sm ${isBossBattle ? 'text-red-400' : 'text-keen-cyan'}`}>
-                {isBossBattle ? '💀 SENTINEL-9' : 'SENTINEL-9'}
+              <h1 className={`font-pixel text-[10px] sm:text-sm ${isBossBattle ? 'text-red-400' : isCelebration ? 'text-keen-yellow' : 'text-keen-cyan'}`}>
+                {isBossBattle ? '💀 SENTINEL-9' : isCelebration ? '🤖 SENTINEL-9' : 'SENTINEL-9'}
               </h1>
-              <p className={`font-pixel text-[8px] sm:text-xs ${isBossBattle ? 'text-orange-400 animate-pulse' : 'text-keen-green'}`}>
+              <p className={`font-pixel text-[8px] sm:text-xs ${isBossBattle ? 'text-orange-400 animate-pulse' : isCelebration ? 'text-keen-lightgreen' : 'text-keen-green'}`}>
                 {getPhaseLabel(phase)}
               </p>
             </div>
@@ -204,12 +271,14 @@ export function ChatInterface({
                 className={`p-1.5 sm:p-2 rounded transition-colors ${
                   isBossBattle 
                     ? 'hover:bg-red-800/50' 
+                    : isCelebration
+                    ? 'hover:bg-keen-darkgreen/50'
                     : 'hover:bg-keen-blue/50'
                 }`}
                 aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
               >
                 {soundOn ? (
-                  <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isBossBattle ? 'text-orange-400' : 'text-keen-green'}`} fill="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${isBossBattle ? 'text-orange-400' : isCelebration ? 'text-keen-yellow' : 'text-keen-green'}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                   </svg>
                 ) : (
@@ -220,7 +289,7 @@ export function ChatInterface({
               </button>
             )}
             {/* Phase indicator */}
-            <div className={`font-pixel text-[8px] sm:text-xs ${isBossBattle ? 'text-red-400' : 'text-keen-yellow'}`}>
+            <div className={`font-pixel text-[8px] sm:text-xs ${isBossBattle ? 'text-red-400' : isCelebration ? 'celebration-text' : 'text-keen-yellow'}`}>
               {getPhaseNumber(phase)}/5
             </div>
           </div>
@@ -256,7 +325,7 @@ export function ChatInterface({
         onScroll={handleScroll}
         className={`flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 z-10 ${
           isBossBattle ? 'bg-black/40 backdrop-blur-[2px]' : ''
-        }`}
+        } ${isCelebration ? 'bg-black/30 backdrop-blur-[2px]' : ''}`}
       >
         {messages.filter(msg => !msg.content.startsWith('[') || msg.role === 'assistant').map((msg, i) => (
           <Message 
@@ -270,10 +339,10 @@ export function ChatInterface({
         
         {isLoading && (
           <div className={`flex items-center gap-2 font-pixel text-[10px] sm:text-sm animate-pulse ${
-            isBossBattle ? 'text-red-400' : 'text-keen-cyan'
+            isBossBattle ? 'text-red-400' : isCelebration ? 'text-keen-lightgreen' : 'text-keen-cyan'
           }`}>
             <span>▓▓▓</span>
-            <span>{isBossBattle ? 'CHARGING ATTACK...' : 'PROCESSING...'}</span>
+            <span>{isBossBattle ? 'CHARGING ATTACK...' : isCelebration ? 'LOADING...' : 'PROCESSING...'}</span>
           </div>
         )}
         
@@ -283,7 +352,7 @@ export function ChatInterface({
       {/* Options (if available) - Mobile optimized */}
       {!isLoading && options.length > 0 && (
         <div className={`p-2 sm:p-4 border-t-2 shrink-0 z-10 ${
-          isBossBattle ? 'border-red-600 bg-red-950/50 backdrop-blur-sm' : 'border-keen-blue'
+          isBossBattle ? 'border-red-600 bg-red-950/50 backdrop-blur-sm' : isCelebration ? 'border-keen-yellow bg-gradient-to-r from-keen-darkgreen/50 via-keen-darkcyan/50 to-keen-darkmagenta/50 backdrop-blur-sm' : 'border-keen-blue'
         }`}>
           <OptionButtons options={options} onSelect={onOptionClick} />
         </div>
@@ -338,6 +407,122 @@ export function ChatInterface({
           }
           .boss-battle-mode {
             background: linear-gradient(180deg, #1a0000 0%, #0d0d0d 50%, #1a0505 100%);
+          }
+        `}</style>
+      )}
+      
+      {/* Celebration CSS */}
+      {isCelebration && (
+        <style jsx global>{`
+          @keyframes celebration-gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          
+          @keyframes rainbow-text {
+            0% { color: #55FFFF; }
+            25% { color: #55FF55; }
+            50% { color: #FFFF55; }
+            75% { color: #FF55FF; }
+            100% { color: #55FFFF; }
+          }
+          
+          @keyframes confetti-fall {
+            0% {
+              transform: translateY(-100vh) rotate(0deg);
+              opacity: 1;
+            }
+            100% {
+              transform: translateY(100vh) rotate(720deg);
+              opacity: 0.7;
+            }
+          }
+          
+          @keyframes glow-pulse {
+            0%, 100% { 
+              box-shadow: 0 0 10px #55FFFF, 0 0 20px #55FF55, 0 0 30px #FFFF55;
+            }
+            50% { 
+              box-shadow: 0 0 20px #FF55FF, 0 0 30px #55FFFF, 0 0 40px #55FF55;
+            }
+          }
+          
+          .celebration-mode {
+            background: linear-gradient(
+              135deg,
+              #001a1a 0%,
+              #001a00 25%,
+              #0d0d0d 50%,
+              #1a001a 75%,
+              #001a1a 100%
+            );
+            background-size: 400% 400%;
+            animation: celebration-gradient 8s ease infinite;
+          }
+          
+          .celebration-overlay {
+            background: linear-gradient(
+              180deg,
+              rgba(0, 170, 170, 0.15) 0%,
+              transparent 30%,
+              transparent 70%,
+              rgba(170, 0, 170, 0.15) 100%
+            );
+          }
+          
+          .celebration-banner {
+            background: linear-gradient(
+              90deg,
+              #003333,
+              #003300,
+              #333300,
+              #330033,
+              #003333
+            );
+            background-size: 200% 100%;
+            animation: celebration-gradient 4s ease infinite;
+          }
+          
+          .celebration-text {
+            animation: rainbow-text 3s ease-in-out infinite;
+          }
+          
+          .celebration-glow {
+            animation: glow-pulse 2s ease-in-out infinite;
+          }
+          
+          .confetti-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, #55FFFF, #55FF55, #FFFF55, #FF55FF);
+            animation: confetti-fall 5s linear infinite;
+          }
+          
+          .confetti-particle:nth-child(odd) {
+            width: 8px;
+            height: 8px;
+            background: #55FFFF;
+          }
+          
+          .confetti-particle:nth-child(even) {
+            width: 6px;
+            height: 12px;
+            background: #FFFF55;
+          }
+          
+          .confetti-particle:nth-child(3n) {
+            width: 12px;
+            height: 6px;
+            background: #55FF55;
+          }
+          
+          .confetti-particle:nth-child(4n) {
+            width: 8px;
+            height: 8px;
+            background: #FF55FF;
+            border-radius: 50%;
           }
         `}</style>
       )}
