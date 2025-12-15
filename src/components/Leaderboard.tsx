@@ -29,7 +29,7 @@ export function formatDuration(startTime: string, endTime: string): string {
   return `${minutes}m${remainingSeconds}s`;
 }
 
-export function formatLeaderboardName(entry: LeaderboardEntry, index: number): string {
+export function formatLeaderboardName(entry: LeaderboardEntry, index: number): { name: string; company?: string } {
   const firstName = entry.full_name?.split(' ')[0]?.toUpperCase();
   const companyName = entry.company_name?.toUpperCase();
   
@@ -42,14 +42,10 @@ export function formatLeaderboardName(entry: LeaderboardEntry, index: number): s
     ];
     const baseName = hackerNames[index % hackerNames.length];
     const randomNum = Math.floor(Math.random() * 900) + 100;
-    return `${baseName}_${randomNum}`;
+    return { name: `${baseName}_${randomNum}` };
   }
   
-  if (companyName) {
-    return `${firstName} from ${companyName}`;
-  }
-  
-  return firstName;
+  return { name: firstName, company: companyName };
 }
 
 interface LeaderboardProps {
@@ -192,38 +188,54 @@ export function Leaderboard({
           </p>
         </div>
       )}
-      <div className="space-y-2">
+      {/* Header row */}
+      <div className="flex items-center px-2 py-1 border-b border-keen-cyan/30 mb-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+          <span className="font-pixel text-[10px] text-keen-cyan/70 w-5 sm:w-6 shrink-0">#</span>
+          <span className="font-pixel text-[10px] text-keen-cyan/70">NAME</span>
+        </div>
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          <span className="font-pixel text-[10px] text-keen-cyan/70 w-12 sm:w-14 text-right">TIME</span>
+          <span className="font-pixel text-[10px] text-keen-cyan/70 w-8 sm:w-14 text-right">TRIES</span>
+        </div>
+      </div>
+
+      <div className="space-y-1">
         {displayEntries.map((entry) => {
           const isCurrentUser = currentUserEmail && entry.email === currentUserEmail;
           const displayRank = entry.rank;
+          const { name, company } = formatLeaderboardName(entry, entry.rank - 1);
           return (
             <div 
               key={`${entry.rank}-${entry.email}`}
-              className={`flex justify-between items-center px-2 py-2 ${
+              className={`flex items-center px-2 py-1.5 ${
                 isCurrentUser 
-                  ? 'bg-keen-yellow/20 border-2 border-keen-yellow animate-pulse' 
-                  : 'border border-keen-darkblue'
+                  ? 'bg-keen-yellow/20 border border-keen-yellow' 
+                  : ''
               }`}
             >
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className={`font-pixel text-xs shrink-0 ${
+              <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+                <span className={`font-pixel text-[10px] sm:text-xs w-5 sm:w-6 shrink-0 ${
                   displayRank === 1 ? 'text-keen-yellow' : 
                   displayRank === 2 ? 'text-keen-gray' : 
                   displayRank === 3 ? 'text-orange-400' : 'text-keen-green'
                 }`}>
-                  {displayRank}.
+                  {displayRank}
                 </span>
-                <span className={`font-pixel text-xs truncate ${isCurrentUser ? 'text-keen-yellow' : 'text-keen-green'}`}>
-                  {formatLeaderboardName(entry, entry.rank - 1)}
+                <span className={`font-pixel text-[10px] sm:text-xs truncate ${isCurrentUser ? 'text-keen-yellow' : 'text-keen-green'}`}>
+                  {name}
                   {isCurrentUser && ' (YOU)'}
+                  {company && !isCurrentUser && (
+                    <span className="text-keen-gray/60 ml-1">({company})</span>
+                  )}
                 </span>
               </div>
-              <div className="flex items-center gap-3 shrink-0 ml-2">
-                <span className="font-pixel text-xs text-keen-magenta">
+              <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                <span className="font-pixel text-[10px] sm:text-xs text-keen-magenta w-12 sm:w-14 text-right">
                   {formatDuration(entry.challenge_started_at, entry.completed_at)}
                 </span>
-                <span className="font-pixel text-xs text-keen-cyan whitespace-nowrap">
-                  {entry.challenge_attempts}x
+                <span className="font-pixel text-[10px] sm:text-xs text-keen-cyan w-8 sm:w-10 text-right">
+                  {entry.challenge_attempts}
                 </span>
               </div>
             </div>

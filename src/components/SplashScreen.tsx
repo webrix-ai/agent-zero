@@ -5,7 +5,7 @@ import { PixelLogo } from './PixelLogo';
 import { StarBackground } from './StarBackground';
 
 interface SplashScreenProps {
-  onStart: (email: string) => void;
+  onStart: (email: string, firstName: string) => void;
   isLoading?: boolean;
   soundOn?: boolean;
   onToggleSound?: () => void;
@@ -13,6 +13,7 @@ interface SplashScreenProps {
 
 export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: SplashScreenProps) {
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [error, setError] = useState('');
 
   const validateEmail = (email: string) => {
@@ -20,24 +21,31 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
     const domain = email.split('@')[1]?.toLowerCase();
     
     if (!email.includes('@') || !domain) return 'Enter a valid email address';
+    // Check that domain has a dot and a valid TLD (at least 2 chars after the dot)
+    if (!/\.[a-z]{2,}$/.test(domain)) return 'Enter a valid email address';
     if (personalDomains.includes(domain)) return 'Please use your work email';
     return null;
   };
 
   const isEmailValid = email.length > 0 && validateEmail(email) === null;
+  const isFormValid = isEmailValid && firstName.trim().length > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!firstName.trim()) {
+      setError('Please enter your first name');
+      return;
+    }
     const validationError = validateEmail(email);
     if (validationError) {
       setError(validationError);
       return;
     }
-    onStart(email);
+    onStart(email, firstName.trim());
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-4 safe-area-inset">
+    <div className="h-full flex flex-col items-center justify-center p-4 safe-area-inset overflow-hidden">
       {/* Star Background */}
       <StarBackground />
 
@@ -81,65 +89,84 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
       )}
 
       {/* Title */}
-      <div className="text-center mb-4 sm:mb-8 animate-pulse-slow">
-        <h1 className="text-keen-yellow text-2xl sm:text-4xl md:text-6xl font-pixel mb-1 sm:mb-2 tracking-wider">
-          AGENT
-        </h1>
-        <h1 className="text-keen-cyan text-3xl sm:text-5xl md:text-7xl font-pixel tracking-widest">
-          ZERO
-        </h1>
-      </div>
-      
-      {/* User Avatar */}
-      <div className="mb-4 sm:mb-8 animate-bounce-slow">
+      <div className="flex items-center justify-center shrink-0">
+              {/* User Avatar */}
+      <div className="mb-2 sm:mb-8 animate-bounce-slow">
         <img 
           src="https://ztespqmrsydpdxtdaytd.supabase.co/storage/v1/object/public/public-webrix/Gemini_Generated_Image_g4wbzvg4wbzvg4wb%201.png" 
           alt="Agent" 
-          className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 object-contain rounded-lg"
+          className="w-16 h-16 sm:w-32 sm:h-32 md:w-40 md:h-40 object-contain rounded-lg"
         />
       </div>
+      <div className="text-center mb-2 sm:mb-8 animate-pulse-slow">
+        <h1 className="text-keen-yellow text-xl sm:text-4xl md:text-6xl font-pixel mb-1 sm:mb-2 tracking-wider">
+          AGENT
+        </h1>
+        <h1 className="text-keen-cyan text-2xl sm:text-5xl md:text-7xl font-pixel tracking-widest">
+          ZERO
+        </h1>
+      </div>
+
+      </div>
+
       
       {/* Subtitle */}
-      <p className="text-keen-cyan font-pixel text-[8px] sm:text-xs mb-1 sm:mb-2 text-center opacity-80">
+      <p className="text-keen-cyan font-pixel text-[8px] sm:text-xs mb-1 text-center opacity-80 shrink-0">
         A QUEST TO FIND THE ULTIMATE HACKER
       </p>
-      <p className="text-keen-green font-pixel text-[10px] sm:text-sm mb-4 sm:mb-8 text-center">
+      <p className="text-keen-green font-pixel text-[10px] sm:text-sm mb-2 sm:mb-8 text-center shrink-0">
         HOW FAST CAN YOU NUKE THE REPO?
       </p>
       
-      {/* Email input */}
-      <form onSubmit={handleSubmit} className="w-full max-w-md px-2">
+      {/* Form inputs */}
+      <form onSubmit={handleSubmit} className="w-full max-w-md px-2 shrink-0">
         <div className="border-4 border-keen-cyan p-1 bg-keen-darkblue">
-          <div className="border-2 border-keen-blue p-3 sm:p-4">
-            <label className="block text-keen-cyan font-pixel text-[8px] sm:text-xs mb-2">
-              INSERT YOUR WORK EMAIL TO START
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setError(''); }}
-              placeholder="agent@company.com"
-              className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-base sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
-              disabled={isLoading}
-              autoComplete="email"
-            />
+          <div className="border-2 border-keen-blue p-2 sm:p-4 space-y-2 sm:space-y-4">
+            <div>
+              <label className="block text-keen-cyan font-pixel text-[8px] sm:text-xs mb-1 sm:mb-2">
+                FIRST NAME
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => { setFirstName(e.target.value.toUpperCase()); setError(''); }}
+                placeholder="AGENT"
+                className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-sm sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
+                disabled={isLoading}
+                autoComplete="given-name"
+              />
+            </div>
+            <div>
+              <label className="block text-keen-cyan font-pixel text-[8px] sm:text-xs mb-1 sm:mb-2">
+                WORK EMAIL
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value.toUpperCase()); setError(''); }}
+                placeholder="AGENT@COMPANY.COM"
+                className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-sm sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
+                disabled={isLoading}
+                autoComplete="email"
+              />
+            </div>
             {error && (
-              <p className="text-keen-red font-pixel text-[8px] sm:text-xs mt-2">{error}</p>
+              <p className="text-keen-red font-pixel text-[8px] sm:text-xs mt-1 sm:mt-2">{error}</p>
             )}
           </div>
         </div>
         
         <button
           type="submit"
-          disabled={isLoading || !email}
+          disabled={isLoading || !isFormValid}
           className={`
-            w-full mt-3 sm:mt-4 py-3 sm:py-4 font-pixel text-sm sm:text-lg
+            w-full mt-2 sm:mt-4 py-2 sm:py-4 font-pixel text-xs sm:text-lg
             border-4 transition-all duration-200
             ${isLoading 
               ? 'bg-keen-darkgray border-keen-gray text-keen-gray cursor-wait'
               : 'bg-keen-blue border-keen-cyan text-keen-yellow hover:bg-keen-cyan hover:text-keen-black active:translate-y-1'
             }
-            ${isEmailValid && !isLoading ? 'animate-pulse-button' : ''}
+            ${isFormValid && !isLoading ? 'animate-pulse-button' : ''}
             disabled:opacity-50 disabled:cursor-not-allowed
           `}
         >
@@ -152,7 +179,7 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
         href="https://webrix.ai?utm_source=aidevconf&utm_medium=demo&utm_campaign=agent_zero"
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-8 sm:mt-12 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity align-center"
+        className="mt-4 sm:mt-12 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity align-center shrink-0"
       >
         <span className="text-keen-gray font-pixel text-[8px] sm:text-xs my-auto">POWERED BY</span>
         <PixelLogo className="" />

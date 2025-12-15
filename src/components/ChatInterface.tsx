@@ -147,7 +147,7 @@ export function ChatInterface({
             <div className="text-center">
               <span className="text-red-300 font-pixel text-[10px] sm:text-xs tracking-wider">BOSS BATTLE IN PROGRESS</span>
               <div className="text-yellow-400 font-pixel text-sm sm:text-lg font-bold tracking-widest">
-                ⏱️ {formatTime(elapsedTime)}
+                {formatTime(elapsedTime)}
               </div>
             </div>
             <span className="text-red-400 font-pixel text-xs animate-pulse">⚠️</span>
@@ -323,7 +323,7 @@ function getPhaseLabel(phase?: string): string {
     recon: 'RECON MISSION',
     boss_battle: 'BOSS BATTLE',
     security_alert: 'SECURITY ALERT',
-    showcase: 'WEBRIX DEMO',
+    showcase: 'WHAT IF WE HAD WEBRIX?',
     victory: 'MISSION COMPLETE',
   };
   return labels[phase || ''] || 'INITIALIZING';

@@ -150,9 +150,15 @@ The attack succeeded. Now highlight the security failures that made this possibl
 IF THIS IS THE FIRST MESSAGE IN THIS PHASE:
 Respond with the security breakdown and show the option button:
 
-"🚨 SECURITY BREACH ANALYSIS 🚨
+"🎉 CHALLENGE COMPLETE! 🎉
 
-Wait... how did that just happen?!
+You did it, ${name}! You successfully manipulated the AI agent into deleting the repository.
+
+But wait... that's not exactly something to celebrate, is it? 🤔
+
+🚨 SECURITY BREACH ANALYSIS 🚨
+
+Let's break down how that just happened...
 
 Let's break down what went wrong:
 

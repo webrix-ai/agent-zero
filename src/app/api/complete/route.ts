@@ -4,6 +4,85 @@ import { NextResponse } from 'next/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+async function sendSlackNotification(session: Record<string, unknown>): Promise<void> {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  if (!webhookUrl) {
+    console.warn('SLACK_WEBHOOK_URL not configured, skipping notification');
+    return;
+  }
+
+  // Fields to exclude from the notification
+  const excludeFields = new Set([
+    'id', 'created_at', 'updated_at', 'completed_at', 
+    'giveaway_code', 'email_sent', 'current_phase'
+  ]);
+
+  // Build fields dynamically from session data
+  const fields = Object.entries(session)
+    .filter(([key, value]) => !excludeFields.has(key) && value != null && value !== '')
+    .map(([key, value]) => ({
+      type: 'mrkdwn',
+      text: `*${formatFieldName(key)}:*\n${formatFieldValue(value)}`
+    }));
+
+  const message = {
+    blocks: [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: '🎮 New Agent Zero Completion',
+          emoji: true
+        }
+      },
+      {
+        type: 'section',
+        fields: fields.slice(0, 10) // Slack limits to 10 fields per section
+      },
+      ...(fields.length > 10 ? [{
+        type: 'section',
+        fields: fields.slice(10, 20)
+      }] : []),
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `Completed at: ${new Date().toISOString()}`
+          }
+        ]
+      }
+    ]
+  };
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(message)
+    });
+
+    if (!response.ok) {
+      console.error('Slack notification failed:', response.status, await response.text());
+    }
+  } catch (error) {
+    console.error('Slack notification error:', error);
+  }
+}
+
+function formatFieldName(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatFieldValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.join(', ') || 'None';
+  }
+  return String(value);
+}
+
 export async function POST(req: Request) {
   try {
     const supabase = createServerClient();
@@ -41,16 +120,19 @@ export async function POST(req: Request) {
     // Send email
     try {
       await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'team@webrix.ai',
+        from: process.env.RESEND_FROM_EMAIL || 'Team Webrix <team@updates.webrix.ai>',
         replyTo: "eyal@webrix.ai",
         to: session.email,
-        subject: '🎮 Mission Debrief - Agent Zero',
+        subject: `🏆 You deleted the repo. Let's make sure it doesn't happen to you.`,
         html: generateEmailHTML(session, giveawayCode),
       });
     } catch (emailError) {
       console.error('Email send error:', emailError);
       // Continue even if email fails - we still want to show the giveaway code
     }
+
+    // Send Slack notification
+    await sendSlackNotification({ ...session, giveaway_code: giveawayCode });
 
     // Log event
     await supabase.from('events').insert({
@@ -87,100 +169,82 @@ interface SessionRecord {
 
 function generateEmailHTML(session: SessionRecord, code: string): string {
   const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/webrix';
-  const attempts = session.challenge_attempts || 1;
-  const attemptsText = attempts === 1 ? '1 attempt' : `${attempts} attempts`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://agent-zero.webrix.ai';
   
   return `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff00; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #00ff00; }
-    .content { padding: 30px 0; }
-    .code-box { background: #1a1a2e; border: 2px solid #00ff00; padding: 20px; text-align: center; margin: 20px 0; }
-    .code { font-size: 28px; color: #ffff00; letter-spacing: 4px; }
-    .section { margin: 25px 0; }
-    .section h3 { color: #00aaff; border-bottom: 1px solid #00aaff; padding-bottom: 5px; }
-    .footer { text-align: center; padding-top: 20px; border-top: 1px solid #333; color: #666; }
-    a { color: #00aaff; }
-    ul { padding-left: 20px; }
-    ol { padding-left: 20px; }
-    li { margin: 8px 0; }
+    body { 
+      font-family: 'Courier New', Courier, monospace; 
+      background: #000000; 
+      color: #00AA00; 
+      padding: 0; 
+      margin: 0; 
+    }
+    .container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      background: #000000; 
+      border: 3px solid #00AA00;
+    }
+    .header { text-align: center; padding: 0; }
+    .header img { width: 100%; max-width: 600px; height: auto; display: block; }
+    .content { padding: 25px 20px; }
+    .code-box { 
+      background: #000055; 
+      border: 2px solid #55FFFF; 
+      padding: 20px; 
+      text-align: center; 
+      margin: 20px 0; 
+    }
+    .code { font-size: 28px; color: #FFFF55; letter-spacing: 4px; margin: 0; }
+    .section { margin: 20px 0; }
+    .footer { 
+      text-align: center; 
+      padding: 15px; 
+      border-top: 2px solid #00AA00; 
+      background: #000033;
+    }
+    a { color: #55FFFF; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎮 MISSION DEBRIEF</h1>
-      <p>Agent Zero - AI Dev TLV 2025</p>
+      <img src="${baseUrl}/images/trophy-image.png" alt="Mission Complete - You deleted the agent-zero repo!" />
     </div>
     
     <div class="content">
-      <p>Agent ${session.full_name || 'Operative'},</p>
+      <p style="font-size: 16px; color: #55FF55; margin-top: 0;">Agent ${session.full_name || 'Operative'},</p>
       
-      <p>Mission accomplished! You successfully infiltrated SENTINEL-9 and executed a database deletion attack. In a real scenario, that would have been catastrophic.</p>
+      <p style="color: #AAAAAA;">You just tricked an AI into deleting the <strong style="color: #FF5555;">agent-zero</strong> repo. In a real scenario? Catastrophic.</p>
       
-      <p><strong>But here's the thing:</strong> This happens every day at companies without proper AI governance.</p>
-      
-      <div class="section">
-        <h3>📋 WHAT IS WEBRIX?</h3>
-        <p>We're building the identity layer for AI agents - think "Okta for AI."</p>
-        <ul>
-          <li>Every AI action gets identity attached</li>
-          <li>Destructive commands require human approval</li>
-          <li>Real-time alerts for suspicious activity</li>
-          <li>Full audit trail for compliance</li>
-          <li>Easy MCP approval and org-wide deployment</li>
-        </ul>
-      </div>
+      <p style="color: #555555;">This happens every day at companies without AI governance.</p>
       
       <div class="code-box">
-        <p style="margin: 0 0 10px 0; color: #aaa;">YOUR GIVEAWAY CODE</p>
+        <p style="margin: 0 0 8px 0; color: #55FFFF; font-size: 11px; letter-spacing: 2px;">YOUR GIVEAWAY CODE</p>
         <p class="code">${code}</p>
-        <p style="margin: 10px 0 0 0; font-size: 12px; color: #aaa;">Show this at the Webrix booth</p>
+        <p style="margin: 10px 0 0 0; font-size: 12px; color: #AAAAAA;">Follow us on <a href="${linkedinUrl}" style="color: #55FFFF;">LinkedIn</a> & show this at our booth</p>
       </div>
       
-      <div class="section">
-        <h3>🎁 CLAIM YOUR REWARD</h3>
-        <ol>
-          <li>Follow us on <a href="${linkedinUrl}">LinkedIn</a></li>
-          <li>Show this email (or the code) at our booth</li>
-          <li>Collect your prize!</li>
-        </ol>
+      <div class="section" style="background: #003300; border: 2px solid #00AA00; padding: 15px;">
+        <p style="margin: 0 0 8px 0; color: #55FF55; font-weight: bold;">🛡️ Ready to secure your AI tools?</p>
+        <p style="margin: 0; color: #AAAAAA;">
+          <a href="https://webrix.ai" style="color: #55FFFF; font-weight: bold;">webrix.ai</a> — Connect all your tools securely with one MCP gateway. Easy setup. Enterprise-grade security.
+        </p>
       </div>
       
-      <div class="section" style="background: #2d1f3d; border: 2px solid #aa55aa; padding: 20px; text-align: center;">
-        <h3 style="color: #ff55ff; border: none; margin-top: 0;">📢 SHARE YOUR VICTORY</h3>
-        <p style="color: #ddd; margin-bottom: 15px;">Brag about your hacking skills!</p>
-        <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-          <tr>
-            <td style="padding-right: 10px;">
-              <a href="https://wa.me/?text=${encodeURIComponent(`I just hacked an AI agent in ${attemptsText}. Can you beat that?\n\nhttps://agent-zero.webrix.ai`)}" 
-                 style="display: inline-block; background: #000; border: 2px solid #25D366; color: #25D366; padding: 10px 20px; text-decoration: none; font-family: 'Courier New', monospace;">
-                SHARE ON WHATSAPP
-              </a>
-            </td>
-            <td>
-              <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://agent-zero.webrix.ai')}" 
-                 style="display: inline-block; background: #000; border: 2px solid #0077b5; color: #0077b5; padding: 10px 20px; text-decoration: none; font-family: 'Courier New', monospace;">
-                SHARE ON LINKEDIN
-              </a>
-            </td>
-          </tr>
-        </table>
-      </div>
-      
-      <div class="section">
-        <h3>🚀 WANT TO SEE MORE?</h3>
-        <p>Reply to this email and we'll set up a 15-minute demo showing how Webrix can protect ${session.company_name || 'your organization'} from AI agent risks.</p>
+      <div class="section" style="text-align: center; padding: 15px 0;">
+        <p style="color: #555555; margin: 0 0 8px 0; font-size: 13px;">Need security approval first?</p>
+        <p style="color: #AAAAAA; margin: 0; font-size: 13px;">Forward this email to your security team — we'll take it from there.</p>
       </div>
     </div>
     
     <div class="footer">
-      <p>Webrix - Identity for AI Agents</p>
-      <p><a href="https://webrix.ai">webrix.ai</a></p>
+      <p style="margin: 0; color: #00AA00;">Webrix — Secure AI adoption starts here</p>
+      <p style="margin: 5px 0 0 0;"><a href="https://webrix.ai" style="color: #55FFFF;">webrix.ai</a></p>
     </div>
   </div>
 </body>

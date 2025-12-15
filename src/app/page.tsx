@@ -80,11 +80,11 @@ export default function AgentZero() {
   // Keep ref in sync with state for use in callbacks
   sessionDataRef.current = sessionData;
 
-  const createSession = async (email: string) => {
+  const createSession = async (email: string, full_name: string) => {
     const res = await fetch('/api/session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, full_name }),
     });
     return res.json();
   };
@@ -192,7 +192,7 @@ export default function AgentZero() {
     }
   }, [messages, updateSession]);
 
-  const handleStart = async (email: string) => {
+  const handleStart = async (email: string, firstName: string) => {
     setIsEnriching(true);
     
     // Start audio on user interaction (click) - this satisfies browser autoplay policies
@@ -201,24 +201,27 @@ export default function AgentZero() {
     }
     
     try {
-      // Create session
-      const session = await createSession(email);
+      // Create session with first name
+      const session = await createSession(email, firstName);
       
-      // Enrich email
+      // Enrich email for company data (but we already have the name from user input)
       const enrichedData = await enrichEmail(email);
       
-      // Update session with enriched data
+      // Update session with enriched data (but keep user-provided first name)
       const fullSessionData: SessionData = {
         id: session.id,
         email,
+        full_name: firstName, // Use user-provided first name
         ...enrichedData,
         challenge_attempts: 0,
       };
+      // Override full_name back to user input (in case enrichedData had one)
+      fullSessionData.full_name = firstName;
       
       await fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: session.id, ...enrichedData }),
+        body: JSON.stringify({ sessionId: session.id, ...enrichedData, full_name: firstName }),
       });
       
       setSessionData(fullSessionData);
