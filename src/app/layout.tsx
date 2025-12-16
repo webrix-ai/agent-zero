@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import PosthogProvider from "@/components/PosthogProvider";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -44,6 +45,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="h-dvh max-h-dvh overflow-hidden">
+      <PosthogProvider
+          apiKey="phc_PvEfDlMUeUUkyVkRPrhY9iQSRlCbcABJ09mgSlHjru0"
+          apiHost="https://us.i.posthog.com"
+          defaults="2025-05-24"
+          personProfiles="identified_only"
+        />
         {children}
       </body>
     </html>
