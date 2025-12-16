@@ -11,6 +11,28 @@ interface SplashScreenProps {
   onToggleSound?: () => void;
 }
 
+// Reset viewport zoom (fixes iOS safari zoom persistence after input focus)
+function resetViewportZoom() {
+  // Blur any focused input to release the zoom
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  
+  // Force viewport reset by temporarily adjusting the meta viewport
+  const viewport = document.querySelector('meta[name="viewport"]');
+  if (viewport) {
+    const originalContent = viewport.getAttribute('content') || '';
+    viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+    
+    // Restore original viewport after a brief moment
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        viewport.setAttribute('content', originalContent);
+      }, 100);
+    });
+  }
+}
+
 export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: SplashScreenProps) {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -53,6 +75,10 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
       setError(validationError);
       return;
     }
+    
+    // Reset viewport zoom before transitioning to chat screen
+    resetViewportZoom();
+    
     onStart(email, firstName.trim());
   };
 
@@ -143,7 +169,7 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
                 value={firstName}
                 onChange={(e) => { setFirstName(e.target.value.toUpperCase()); setError(''); }}
                 placeholder="AGENT"
-                className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-sm sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
+                className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-base sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
                 disabled={isLoading}
                 autoComplete="given-name"
               />
@@ -157,7 +183,7 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
                 value={email}
                 onChange={(e) => { setEmail(e.target.value.toUpperCase()); setError(''); }}
                 placeholder="AGENT@COMPANY.COM"
-                className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-sm sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
+                className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-base sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
                 disabled={isLoading}
                 autoComplete="email"
               />
