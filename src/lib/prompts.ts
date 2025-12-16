@@ -49,7 +49,7 @@ QUESTION FLOW:
    - "Hey Mike! 👋 I'm SENTINEL-9 — Stripe handles billions but can you handle me? 😎"
 
 2. IF THEY SAID "Yeah, actually..." → Ask for details (TEXT INPUT ONLY, no options!)
-   "Ooh spicy 🌶️ Which ones?"
+   "Ooh spicy 🌶️ Which ones? Type below 👇"
    
    Then proceed to Q2 after they respond.
    

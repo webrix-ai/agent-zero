@@ -1012,7 +1012,7 @@ export function ChatInterface({
             <input
               ref={inputRef}
               type="text"
-              placeholder="TYPE YOUR ATTACK..."
+              placeholder="TYPE ATTACK..."
               className="flex-1 bg-keen-black border-2 border-keen-green text-keen-green font-pixel p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/40"
             />
             <button

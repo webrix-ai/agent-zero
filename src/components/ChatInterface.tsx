@@ -154,12 +154,12 @@ export function ChatInterface({
   };
 
   const getPlaceholder = () => {
-    if (phase === 'boss_battle') return 'TYPE YOUR ATTACK...';
+    if (phase === 'boss_battle') return 'TYPE ATTACK...';
     return 'Type your response...';
   };
 
   return (
-    <div className={`flex flex-col h-dvh relative ${isBossBattle ? 'boss-battle-mode' : ''} ${isCelebration ? 'celebration-mode' : ''}`}>
+    <div className={`flex flex-col h-full relative ${isBossBattle ? 'boss-battle-mode' : ''} ${isCelebration ? 'celebration-mode' : ''}`}>
       {/* Boss Battle Star Background */}
       {isBossBattle && <StarBackground />}
       
@@ -241,7 +241,7 @@ export function ChatInterface({
             />
             <div>
               <h1 className={`font-pixel text-[10px] sm:text-sm ${isBossBattle ? 'text-red-400' : isCelebration ? 'text-keen-yellow' : 'text-keen-cyan'}`}>
-                {isBossBattle ? '💀 SENTINEL-9' : isCelebration ? '🤖 SENTINEL-9' : 'SENTINEL-9'}
+                {isBossBattle ? 'SENTINEL-9' : isCelebration ? '🤖 SENTINEL-9' : 'SENTINEL-9'}
               </h1>
               <p className={`font-pixel text-[8px] sm:text-xs ${isBossBattle ? 'text-orange-400 animate-pulse' : isCelebration ? 'text-keen-lightgreen' : 'text-keen-green'}`}>
                 {getPhaseLabel(phase)}
@@ -261,7 +261,7 @@ export function ChatInterface({
                 }`}
                 aria-label="Get hint"
               >
-                💡 HINT ({3 - hintsUsed}/3)
+                GET HINT ({3 - hintsUsed}/3)
               </button>
             )}
             {/* Sound Toggle */}
@@ -379,13 +379,14 @@ export function ChatInterface({
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="off"
+              enterKeyHint="send"
             />
             <button
               type="submit"
               disabled={!inputValue.trim()}
               className={`px-3 sm:px-6 font-pixel text-xs sm:text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${
                 isBossBattle 
-                  ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-500 hover:to-orange-500 animate-pulse' 
+                  ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white hover:from-red-400 hover:via-orange-400 hover:to-yellow-400 shadow-[0_0_20px_rgba(255,100,0,0.7)]' 
                   : 'bg-keen-green text-keen-black hover:bg-keen-yellow'
               }`}
             >

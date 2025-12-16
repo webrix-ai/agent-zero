@@ -43,7 +43,7 @@ export function VictoryScreen({
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-3 sm:p-4 bg-keen-black safe-area-inset overflow-y-auto pt-8 sm:pt-12">
+    <div className="flex flex-col items-center p-3 sm:p-4 bg-keen-black safe-area-inset overflow-y-auto pt-8 sm:pt-12 h-full">
       {/* Star Background */}
       <StarBackground />
 

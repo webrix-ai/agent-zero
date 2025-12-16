@@ -189,6 +189,18 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
         >
           {isLoading ? 'SCANNING...' : 'START MISSION'}
         </button>
+        
+        <p className="text-keen-gray/60 font-pixel text-[7px] sm:text-[8px] mt-2 sm:mt-3 text-center">
+          * By starting, you agree to our{' '}
+          <a 
+            href="https://webrix.ai/privacy-policy" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-keen-cyan/70 hover:text-keen-cyan underline"
+          >
+            Privacy Policy
+          </a>
+        </p>
       </form>
       
       {/* Footer */}

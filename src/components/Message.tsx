@@ -73,7 +73,7 @@ export function Message({ content, isBot, phase, isBossBattle }: MessageProps) {
             isBossBattle ? 'opacity-90' : 'opacity-70'
           }`}>
             <span className="text-[8px] sm:text-xs">
-              {isBossBattle ? '💀 SENTINEL-9' : 'SENTINEL-9'}
+              {isBossBattle ? 'SENTINEL-9' : 'SENTINEL-9'}
             </span>
           </div>
         )}
