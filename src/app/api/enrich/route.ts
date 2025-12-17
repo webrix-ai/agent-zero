@@ -71,7 +71,17 @@ function extractNameFromEmail(email: string): string | null {
   return capitalize(local);
 }
 
-function domainToCompanyName(domain: string): string {
+// Personal email domains that shouldn't be treated as company names
+const PERSONAL_EMAIL_DOMAINS = [
+  'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com',
+  'aol.com', 'protonmail.com', 'mail.com', 'live.com', 'msn.com'
+];
+
+function domainToCompanyName(domain: string): string | null {
+  // Don't treat personal email domains as company names
+  if (PERSONAL_EMAIL_DOMAINS.includes(domain.toLowerCase())) {
+    return null;
+  }
   // Remove common TLDs and capitalize
   const name = domain.split('.')[0];
   return name.charAt(0).toUpperCase() + name.slice(1);

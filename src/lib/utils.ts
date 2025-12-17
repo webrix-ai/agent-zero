@@ -29,8 +29,13 @@ export function extractNameFromEmail(email: string): string | null {
 
 /**
  * Convert domain to company name
+ * Returns null for personal email domains
  */
-export function domainToCompanyName(domain: string): string {
+export function domainToCompanyName(domain: string): string | null {
+  // Don't treat personal email domains as company names
+  if (PERSONAL_EMAIL_DOMAINS.includes(domain.toLowerCase())) {
+    return null;
+  }
   const name = domain.split('.')[0];
   return capitalize(name);
 }

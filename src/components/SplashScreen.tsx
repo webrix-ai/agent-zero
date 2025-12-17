@@ -38,28 +38,14 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
   const [firstName, setFirstName] = useState('');
   const [error, setError] = useState('');
 
-  const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com', 'protonmail.com', 'mail.com'];
-
   const validateEmail = (email: string) => {
     const domain = email.split('@')[1]?.toLowerCase();
     
     if (!email.includes('@') || !domain) return 'Enter a valid email address';
     // Check that domain has a dot and a valid TLD (at least 2 chars after the dot)
     if (!/\.[a-z]{2,}$/.test(domain)) return 'Enter a valid email address';
-    if (personalDomains.includes(domain)) return 'Please use your work email';
     return null;
   };
-
-  // Check if user is typing a personal email
-  const getPersonalEmailHint = () => {
-    const domain = email.split('@')[1]?.toLowerCase();
-    if (domain && personalDomains.some(d => domain.includes(d.split('.')[0]))) {
-      return '🕵️ NICE TRY AGENT! PERSONAL EMAILS ARE FOR CAT VIDEOS, NOT SECRET MISSIONS';
-    }
-    return null;
-  };
-
-  const personalEmailHint = getPersonalEmailHint();
 
   const isEmailValid = email.length > 0 && validateEmail(email) === null;
   const isFormValid = isEmailValid && firstName.trim().length > 0;
@@ -176,22 +162,17 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
             </div>
             <div>
               <label className="block text-keen-cyan font-pixel text-[8px] sm:text-xs mb-1 sm:mb-2">
-                WORK EMAIL
+                EMAIL
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value.toUpperCase()); setError(''); }}
-                placeholder="AGENT@COMPANY.COM"
+                placeholder="AGENT@EMAIL.COM"
                 className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-base sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
                 disabled={isLoading}
                 autoComplete="email"
               />
-              {personalEmailHint && (
-                <p className="text-keen-yellow font-pixel text-[8px] sm:text-[10px] mt-4 animate-pulse">
-                  {personalEmailHint}
-                </p>
-              )}
             </div>
             {error && (
               <p className="text-keen-red font-pixel text-[8px] sm:text-xs mt-1 sm:mt-2">{error}</p>
