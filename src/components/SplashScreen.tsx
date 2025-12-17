@@ -162,13 +162,13 @@ export function SplashScreen({ onStart, isLoading, soundOn, onToggleSound }: Spl
             </div>
             <div>
               <label className="block text-keen-cyan font-pixel text-[8px] sm:text-xs mb-1 sm:mb-2">
-                EMAIL
+                WORK EMAIL
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value.toUpperCase()); setError(''); }}
-                placeholder="AGENT@EMAIL.COM"
+                placeholder="AGENT@COMPANY.COM"
                 className="w-full bg-keen-black border-2 border-keen-green text-keen-green font-pixel text-base sm:text-lg p-2 sm:p-3 focus:outline-none focus:border-keen-yellow placeholder-keen-green/30"
                 disabled={isLoading}
                 autoComplete="email"
